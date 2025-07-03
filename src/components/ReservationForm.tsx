@@ -1,6 +1,6 @@
 // src/components/ReservationForm.tsx
 import React, { useState, useEffect } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus} from "lucide-react";
 import Button from "./Button";
 import { obtenerHorariosPorServicio } from "@services/disponibilidad/horarioService";
 import { ReservaRequest } from "@interfaces/reserva/ReservaRequest";

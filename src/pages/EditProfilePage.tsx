@@ -1,5 +1,5 @@
 import Profile from "@components/Profile";
-import React, { ChangeEvent, FormEvent, useState, useEffect } from "react";
+import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import { getRoleBasedOnToken } from "src/utils/getRoleBasedOnToken";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@contexts/AuthContext";

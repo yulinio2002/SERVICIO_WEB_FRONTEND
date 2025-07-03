@@ -1,7 +1,6 @@
 // src/components/ServiceReviews.tsx
 import React, { useState, useEffect } from "react";
 import { Star, X } from "lucide-react";
-import Button from "./Button";
 import { obtenerResenasPorServicio } from "@services/resena/resenaService";
 import { ResenaResponse } from "@interfaces/resena/ResenaResponse";
 
@@ -16,8 +15,8 @@ export const ServiceReviews: React.FC<ServiceReviewsProps> = ({
 }) => {
   const [reviews, setReviews] = useState<ResenaResponse[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
+
     const load = async () => {
       setLoading(true);
       try {

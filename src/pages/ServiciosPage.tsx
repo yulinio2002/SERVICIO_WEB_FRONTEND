@@ -13,8 +13,6 @@ import {
   eliminarServicio,
   cambiarEstadoServicio
 } from "@services/servicio/servicioService";
-
-import { obtenerResenasPorServicio } from "@services/resena/resenaService";
 import Footer from '@components/Footer';
 import { ServiceForm } from '@components/ServiceForm';
 import { crearHorarioDeServicio } from '@services/disponibilidad/horarioService';
@@ -119,16 +117,7 @@ const ServiciosPage: React.FC = () => {
       alert("Error al cambiar el estado del servicio");
     }
   };
-
-  // // Reviews
-  // const handleViewReviews = async (id: number) => {
-  //   try {
-  //     const resenas = await obtenerResenasPorServicio(id);
-  //     console.log("Reseñas:", resenas);
-  //   } catch (error) {
-  //     console.error("Error al obtener reseñas:", error);
-  //   }
-  // };
+  // Reviews
   const handleViewReviews = (id: number) => {
   setViewingReviewsId(id);
   };
@@ -153,18 +142,10 @@ const ServiciosPage: React.FC = () => {
   }
 };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Cargando servicios...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <Navbar avatarUrl="#" userName={user == null? "User": user.nombre} badgeLabel = "Proveedor"/>
+      <Navbar userName={user == null? "User": user.nombre} badgeLabel = "Proveedor"/>
       <div className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
@@ -182,6 +163,7 @@ const ServiciosPage: React.FC = () => {
 
       {/* Content */}
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 w-full">
+
       {/* Create Form */}
       {isCreating && (
         <ServiceForm
@@ -229,14 +211,20 @@ const ServiciosPage: React.FC = () => {
      )}
 
       {/* Services Table */}
-      <ServiciosTable
-        servicios={servicios}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onViewSchedule={handleViewSchedule}
-        onViewReviews={handleViewReviews}
-        onToggleStatus={handleToggleStatus}
-      />
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="text-gray-500">Cargando servicios...</div>
+        </div>
+      ) : (
+        <ServiciosTable
+          servicios={servicios}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onViewSchedule={handleViewSchedule}
+          onViewReviews={handleViewReviews}
+          onToggleStatus={handleToggleStatus}
+        />
+      )}
       </div>
 
       {/* Footer */}

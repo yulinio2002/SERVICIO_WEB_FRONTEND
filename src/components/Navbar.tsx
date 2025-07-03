@@ -8,10 +8,9 @@ import {useAuthContext} from "@contexts/AuthContext.tsx";
 import {getRoleBasedOnToken} from "../utils/getRoleBasedOnToken.ts";
 
 interface NavbarProps {
-  avatarUrl: string;
-  userName: string;
-  badgeLabel?: string;
-  onLogout?: () => void;
+    userName: string;
+    badgeLabel?: string;
+    onLogout?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({

@@ -170,8 +170,10 @@ const ServiciosClientePage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar avatarUrl="#" userName={user == null? "User": user.nombre} badgeLabel = "Cliente"/>
-
+      <Navbar avatarUrl="#"
+              userName={user?.nombre || "Cliente"}
+              badgeLabel="Cliente"
+            />
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6">
