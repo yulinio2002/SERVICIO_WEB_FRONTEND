@@ -40,3 +40,7 @@ replay_pid*
 !.env.example
 
 node_modules/
+### Build output ###
+dist/
+tsconfig.app.tsbuildinfo
+tsconfig.node.tsbuildinfo

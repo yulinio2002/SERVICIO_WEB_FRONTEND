@@ -113,16 +113,7 @@ const ServiciosPage: React.FC = () => {
       alert("Error al cambiar el estado del servicio");
     }
   };
-
-  // // Reviews
-  // const handleViewReviews = async (id: number) => {
-  //   try {
-  //     const resenas = await obtenerResenasPorServicio(id);
-  //     console.log("Reseñas:", resenas);
-  //   } catch (error) {
-  //     console.error("Error al obtener reseñas:", error);
-  //   }
-  // };
+  // Reviews
   const handleViewReviews = (id: number) => {
   setViewingReviewsId(id);
   };

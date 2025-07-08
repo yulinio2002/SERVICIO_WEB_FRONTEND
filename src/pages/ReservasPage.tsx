@@ -12,8 +12,10 @@ import {
   aceptarReserva,
   completarReserva
 } from "@services/reserva/reservaService";
+import {getMeInfo} from "@services/auth/me.ts";
 import { obtenerServiciosProveedor } from "@services/servicio/servicioService";
 import { obtenerCliente } from "@services/cliente/ClienteService";
+import {AuthMeDto} from "@interfaces/auth/AuthMeDto.ts";
 import { format } from "date-fns";
 
 const ReservasPage: React.FC = () => {
@@ -23,12 +25,15 @@ const ReservasPage: React.FC = () => {
   const [clientesMap, setClientesMap]   = useState<Record<number, ClienteResponse>>({});
   const [loading, setLoading]           = useState(true);
   const [actingId, setActingId]         = useState<number | null>(null);
-
+  const [user,setUser] = useState<AuthMeDto>();
   useEffect(() => {
     if (!userId) return;
     (async () => {
       setLoading(true);
       try {
+        // 0) Cargar datos del usuario
+        const me = await getMeInfo();
+        setUser(me);
         // 1) Cargar reservas
         const reservasData = await obtenerReservasProveedor(userId);
         setReservas(reservasData);
@@ -82,17 +87,9 @@ const ReservasPage: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Cargando reservas...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar avatarUrl="#" userName="Usuario" />
+      <Navbar userName={user == null? "User": user.nombre} badgeLabel = "Proveedor"/>
 
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -102,6 +99,9 @@ const ReservasPage: React.FC = () => {
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         <div className="overflow-x-auto bg-white shadow rounded-lg">
+          {loading ? (
+          <div className="text-center text-gray-500">Cargando reservas...</div>
+        ) : (
           <table className="w-full table-fixed">
             <thead>
               <tr className="bg-gray-100 text-left">
@@ -180,6 +180,7 @@ const ReservasPage: React.FC = () => {
               )}
             </tbody>
           </table>
+        )}
         </div>
       </div>
 

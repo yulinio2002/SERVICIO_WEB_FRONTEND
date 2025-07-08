@@ -1,41 +1,53 @@
-// src/pages/ReservasClientePage.tsx
 import React, { useState, useEffect } from "react";
 import { Navbar } from "@components/Navbar";
 import Footer from "@components/Footer";
 import Button from "@components/Button";
+import { Star } from "lucide-react";
 import { useAuthContext } from "@contexts/AuthContext";
 import { ReservaResponse } from "@interfaces/reserva/RerservaResponse";
 import { ServicioResponse } from "@interfaces/servicio/ServicioResponse";
+import { ResenaForm } from "@components/ResenaForm";
 import {
   obtenerReservasCliente,
   cancelarReserva,
 } from "@services/reserva/reservaService";
 import { obtenerServiciosActivos } from "@services/servicio/servicioService";
 import { format } from "date-fns";
+import { AuthMeDto } from "@interfaces/auth/AuthMeDto";
+import { getMeInfo } from "@services/auth/me";
 
 const ReservasPageCliente: React.FC = () => {
   const { userId: clienteId } = useAuthContext();
+  const [user, setUser] = useState<AuthMeDto | null>(null);
   const [reservas, setReservas] = useState<ReservaResponse[]>([]);
   const [serviciosMap, setServiciosMap] = useState<Record<number, ServicioResponse>>({});
   const [loading, setLoading] = useState(true);
   const [actingId, setActingId] = useState<number | null>(null);
+  const [reservaParaCalificar, setReservaParaCalificar] = useState<ReservaResponse | null>(null);
 
+  // Carga datos de usuario y reservas
   useEffect(() => {
+    
     if (!clienteId) return;
     (async () => {
       setLoading(true);
       try {
-        // 1) traer reservas del cliente
+      
+        // Obtener datos del usuario
+        const me = await getMeInfo();
+        setUser(me);
+        
+        // Obtener reservas
         const reservasData = await obtenerReservasCliente(clienteId);
         setReservas(reservasData);
 
-        // 2) traer servicios activos y armar un map id→servicio
+        // Obtener servicios activos y mapear por id
         const serviciosData = await obtenerServiciosActivos();
         const map: Record<number, ServicioResponse> = {};
-        serviciosData.forEach(s => { map[s.id] = s });
+        serviciosData.forEach((s) => { map[s.id] = s; });
         setServiciosMap(map);
       } catch (err) {
-        console.error("Error cargando reservas o servicios:", err);
+        console.error("Error cargando datos del cliente o reservas:", err);
       } finally {
         setLoading(false);
       }
@@ -43,35 +55,37 @@ const ReservasPageCliente: React.FC = () => {
   }, [clienteId]);
 
   const handleCancel = async (reservaId: number) => {
-  if (!window.confirm("¿Cancelar esta reserva?")) return;
-  setActingId(reservaId);
-  try {
-    // CORRECCIÓN: Enviar clienteId primero y luego reservaId
-    await cancelarReserva(clienteId!, reservaId);
-    
-    // Actualización optimizada del estado
-    setReservas(prev => prev.map(r => 
-      r.id === reservaId ? {...r, estado: "CANCELADA"} : r
-    ));
-  } catch (err) {
-    console.error("Error cancelando reserva:", err);
-    alert(`Error: ${(err as any).response?.data?.message || "No se pudo cancelar la reserva"}`);
-  } finally {
-    setActingId(null);
-  }
-};
+    if (!window.confirm("¿Cancelar esta reserva?")) return;
+    setActingId(reservaId);
+    try {
+      await cancelarReserva(clienteId!, reservaId);
+      setReservas((prev) =>
+        prev.map((r) =>
+          r.id === reservaId ? { ...r, estado: "CANCELADA" } : r
+        )
+      );
+    } catch (err) {
+      console.error("Error cancelando reserva:", err);
+      alert(
+        `Error: ${(err as any).response?.data?.message ||
+          "No se pudo cancelar la reserva"}`
+      );
+    } finally {
+      setActingId(null);
+    }
+  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Cargando reservas...</div>
-      </div>
-    );
-  }
+  const handleCalificar = (reserva: ReservaResponse) => {
+    setReservaParaCalificar(reserva);
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar avatarUrl="#" userName="Cliente" />
+      <Navbar avatarUrl="#"
+        userName={user?.nombre || "Cliente"}
+        badgeLabel="Cliente"
+      />
 
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -81,6 +95,9 @@ const ReservasPageCliente: React.FC = () => {
 
       <div className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
         <div className="overflow-x-auto bg-white shadow rounded-lg">
+          {loading ? (
+          <div className="text-center text-gray-500">Cargando reservas...</div>
+        ) : (
           <table className="w-full table-fixed">
             <thead>
               <tr className="bg-gray-100 text-left">
@@ -95,12 +112,15 @@ const ReservasPageCliente: React.FC = () => {
             <tbody>
               {reservas.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                  <td
+                    colSpan={6}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
                     No tienes reservas
                   </td>
                 </tr>
               ) : (
-                reservas.map(r => {
+                reservas.map((r) => {
                   const servicio = serviciosMap[r.servicioId];
                   return (
                     <tr key={r.id} className="border-t">
@@ -131,13 +151,23 @@ const ReservasPageCliente: React.FC = () => {
                           {r.estado}
                         </span>
                       </td>
-                      <td className="px-6 py-4 space-x-2">
+                      <td className="px-6 py-4 space-x-2 flex items-center">
                         {r.estado === "PENDIENTE" ? (
                           <Button
-                            message={actingId === r.id ? "Cancelando..." : "Cancelar"}
+                            message={
+                              actingId === r.id ? "Cancelando..." : "Cancelar"
+                            }
                             onClick={() => handleCancel(r.id)}
                             disabled={actingId === r.id}
                           />
+                        ) : r.estado === "COMPLETADA" ? (
+                          <button
+                            onClick={() => handleCalificar(r)}
+                            className="p-2 rounded-md hover:bg-gray-100"
+                            aria-label="Calificar"
+                          >
+                            <Star className="w-6 h-6 text-yellow-500" />
+                          </button>
                         ) : (
                           <span className="text-gray-500">—</span>
                         )}
@@ -148,7 +178,23 @@ const ReservasPageCliente: React.FC = () => {
               )}
             </tbody>
           </table>
+)}
         </div>
+
+        {reservaParaCalificar && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+              <ResenaForm
+                servicioId={reservaParaCalificar.servicioId}
+                clienteId={clienteId!}
+                onSuccess={() => {
+                  setReservaParaCalificar(null);
+                }}
+                onCancel={() => setReservaParaCalificar(null)}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <Footer />
