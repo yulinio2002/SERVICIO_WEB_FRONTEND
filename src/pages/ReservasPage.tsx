@@ -12,10 +12,8 @@ import {
   aceptarReserva,
   completarReserva
 } from "@services/reserva/reservaService";
-import {getMeInfo} from "@services/auth/me.ts";
 import { obtenerServiciosProveedor } from "@services/servicio/servicioService";
 import { obtenerCliente } from "@services/cliente/ClienteService";
-import {AuthMeDto} from "@interfaces/auth/AuthMeDto.ts";
 import { format } from "date-fns";
 
 const ReservasPage: React.FC = () => {
@@ -25,15 +23,12 @@ const ReservasPage: React.FC = () => {
   const [clientesMap, setClientesMap]   = useState<Record<number, ClienteResponse>>({});
   const [loading, setLoading]           = useState(true);
   const [actingId, setActingId]         = useState<number | null>(null);
-  const [user,setUser] = useState<AuthMeDto>();
+
   useEffect(() => {
     if (!userId) return;
     (async () => {
       setLoading(true);
       try {
-        // 0) Cargar datos del usuario
-        const me = await getMeInfo();
-        setUser(me);
         // 1) Cargar reservas
         const reservasData = await obtenerReservasProveedor(userId);
         setReservas(reservasData);
@@ -89,7 +84,7 @@ const ReservasPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar userName={user == null? "User": user.nombre} badgeLabel = "Proveedor"/>
+      <Navbar/>
 
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -144,17 +139,20 @@ const ReservasPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                            r.estado === 'PENDIENTE'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : r.estado === 'ACEPTADA'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-green-100 text-green-800'
-                          }`}
+                            className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                                r.estado === 'PENDIENTE'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : r.estado === 'ACEPTADA'
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : r.estado === 'CANCELADA'
+                                            ? 'bg-red-100 text-red-800'  // Estilo para CANCELADA
+                                            : 'bg-green-100 text-green-800'  // Estilo por defecto (ej. "FINALIZADA")
+                            }`}
                         >
                           {r.estado}
                         </span>
                       </td>
+
                       <td className="px-6 py-4 space-x-2">
                         {r.estado === 'PENDIENTE' && (
                           <Button

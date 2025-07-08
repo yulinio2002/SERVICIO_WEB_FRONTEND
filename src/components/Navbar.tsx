@@ -46,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                 <div className="hidden sm:flex space-x-4">
                     {isCliente ? (
                         <>
-                            <Button message="Mis Servicios" to="/serviciosCliente" />
+                            <Button message="Buscar Servicios" to="/serviciosCliente" />
                             <Button message="Mis Reservas" to="/reservasCliente" />
                         </>
                     ) : isProveedor ? (
