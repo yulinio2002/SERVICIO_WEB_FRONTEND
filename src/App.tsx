@@ -1,10 +1,10 @@
-//import {Navbar} from "@components/Navbar";
-import { Outlet } from "react-router-dom";
+// src/App.tsx
+import React from "react";
+import AppRouter from "./router/AppRouter";
+import "./styles/index.css";
 
-export default function App() {
-	return (
-		<div className="min-h-screen bg-gray-50">
-			<Outlet />
-		</div>
-	);
-}
+const App: React.FC = () => {
+	return <AppRouter />;
+};
+
+export default App;
