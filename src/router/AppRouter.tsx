@@ -10,6 +10,7 @@ import WhatsAppButton from "@components/common/WhatsAppButton";
 // import Nosotros from "@/pages/Nosotros";
 // import Servicios from "@/pages/Servicios";
 import ServicioDetalle from "@pages/ServicioDetalle";
+import NotFound from "@pages/NotFound.tsx";
 // import Proyectos from "@/pages/Proyectos";
 // import Contacto from "@/pages/Contacto";
 // import Funcionalidad from "@/pages/Funcionalidad";
@@ -32,6 +33,7 @@ const AppRouter: React.FC = () => {
 						<Route path="/funcionalidad/:slug" element={<Funcionalidad />} />
 						<Route path="/marcas" element={<Marcas />} />
 						<Route path="/marcas/:slug" element={<Marcas />} /> */}
+						<Route path="*" element={<NotFound />} />
 					</Routes>
 				</main>
 				<Footer />

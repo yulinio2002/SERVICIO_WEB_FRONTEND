@@ -18,7 +18,7 @@ const WhatsAppButton: React.FC = () => {
 			aria-label="Contactar por WhatsApp"
 		>
 			<img
-				src="/images/wa.png"
+				src="/icons/whatsapp.jpg"
 				alt="WhatsApp"
 				className="w-full h-full object-contain"
 			/>

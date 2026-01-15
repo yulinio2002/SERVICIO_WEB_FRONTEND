@@ -10,21 +10,25 @@ const Footer: React.FC = () => {
 			name: "Facebook",
 			url: "https://www.facebook.com/oleohidraulicservices/",
 			icon: "lab la-facebook-f",
+			faIcon: "fab fa-facebook-f", // Font Awesome alternativo
 		},
 		{
 			name: "Twitter",
 			url: "https://twitter.com/Oleohidraulics",
 			icon: "lab la-twitter",
+			faIcon: "fab fa-twitter",
 		},
 		{
 			name: "Instagram",
 			url: "https://www.instagram.com/oleohidraulic_services/",
 			icon: "lab la-instagram",
+			faIcon: "fab fa-instagram",
 		},
 		{
 			name: "LinkedIn",
 			url: "https://www.linkedin.com/company/oleohidraulics-services-s-a-c/",
 			icon: "lab la-linkedin-in",
+			faIcon: "fab fa-linkedin-in",
 		},
 	];
 
@@ -66,11 +70,15 @@ const Footer: React.FC = () => {
 									href={social.url}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex rounded-full w-14 h-14 hover:bg-orange-primary hover:text-white transition-colors items-center justify-center"
+									className="inline-flex rounded-full w-14 h-14 hover:bg-orange-primary hover:text-white transition-colors items-center justify-center border-2 border-gray-300 hover:border-orange-primary"
+									aria-label={`Visitar ${social.name}`}
 								>
+									{/* Intentar con Line Awesome primero */}
 									<i
 										className={`${social.icon} text-xl md:text-2xl 2xl:text-3xl`}
 									></i>
+									{/* Fallback con Font Awesome si Line Awesome no funciona */}
+									{/* <i className={`${social.faIcon} text-xl md:text-2xl 2xl:text-3xl`}></i> */}
 								</a>
 							))}
 						</div>
@@ -81,17 +89,26 @@ const Footer: React.FC = () => {
 				<div className="grid grid-cols-1 lg:grid-cols-12 pb-16 gap-y-4 lg:gap-x-14">
 					<div className="col-span-1 lg:col-span-6">
 						<h4 className="font-bold xl:text-lg mb-6 2xl:mb-8">Políticas</h4>
-						<Link to="/terminos-y-condiciones" className="hover:font-bold">
+						<Link
+							to="/terminos-y-condiciones"
+							className="hover:text-blue-primary transition-colors"
+						>
 							Términos y condiciones
 						</Link>
 					</div>
 					<div className="col-span-1 lg:col-span-3 flex items-end">
-						<Link to="/politica-de-privacidad" className="hover:font-bold">
+						<Link
+							to="/politica-de-privacidad"
+							className="hover:text-blue-primary transition-colors"
+						>
 							Políticas de Privacidad
 						</Link>
 					</div>
 					<div className="col-span-1 lg:col-span-3 flex items-end">
-						<Link to="/uso-de-datos" className="hover:font-bold">
+						<Link
+							to="/uso-de-datos"
+							className="hover:text-blue-primary transition-colors"
+						>
 							Uso de datos
 						</Link>
 					</div>
@@ -114,6 +131,10 @@ const Footer: React.FC = () => {
 							src="/images/logo-mk.svg"
 							className="w-5 h-4"
 							alt="agenciamk"
+							onError={(e) => {
+								// Fallback si la imagen no carga
+								e.currentTarget.style.display = "none";
+							}}
 						/>
 					</a>
 				</div>

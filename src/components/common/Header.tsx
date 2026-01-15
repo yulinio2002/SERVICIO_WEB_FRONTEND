@@ -28,7 +28,7 @@ const Header: React.FC = () => {
 					{/* Logo */}
 					<Link to="/" className="flex items-center mb-0">
 						<img
-							src="src/images/logo.jpeg"
+							src="/images/logo.jpeg"
 							className="h-14 lg:h-14 2xl:h-20 w-auto"
 							alt="Oleohidraulics"
 						/>
