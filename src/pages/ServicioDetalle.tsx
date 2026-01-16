@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import ServiceGallery from '@components/servicios/ServiceGallery';
 import QuoteForm from '@components/servicios/QuoteForm';
 import type { Service } from '@interfaces/servicio/Service';
+import QuoteButton from "@components/common/QuoteButton.tsx";
 
 const ServicioDetalle: React.FC = () => {
 	const { slug } = useParams<{ slug: string }>();
@@ -124,14 +125,7 @@ const ServicioDetalle: React.FC = () => {
 						</ul>
 					</div>
 					<div className="flex w-full justify-center">
-						<button onClick={scrollToForm} className="flex items-center group">
-							<div className="view-more">
-								<span>Cotizar </span>
-								<div className="h-6 w-6 rounded-full bg-blue-900 flex items-center justify-center ml-3 group-hover:bg-orange-600 transition-colors duration-300">
-									<i className="las la-angle-right text-white text-xs"></i>
-								</div>
-							</div>
-						</button>
+						<QuoteButton onClick={scrollToForm} />
 					</div>
 				</div>
 			</section>

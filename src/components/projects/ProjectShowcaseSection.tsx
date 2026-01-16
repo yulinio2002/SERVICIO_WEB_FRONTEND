@@ -1,25 +1,19 @@
-// src/components/projects/ProductShowcaseSection.tsx
+// src/components/projects/ProjectShowcaseSection.tsx
 import QuoteButton from "@components/common/QuoteButton";
 import type { ProjectType } from "@interfaces/project/ProjectTypes.ts";
 
 type Props = {
 	project: ProjectType;
 	className?: string;
+	onQuoteClick?: () => void; // Nueva prop
 };
 
-export default function ProductShowcaseSection({
+export default function ProjectShowcaseSection({
 	project,
-	className = ""
+	className = "",
+	onQuoteClick,
 }: Props) {
 	const isImageRight = (project.layout ?? "imageRight") === "imageRight";
-
-	// Función para hacer scroll al formulario
-	const scrollToForm = () => {
-		const formElement = document.getElementById("form");
-		if (formElement) {
-			formElement.scrollIntoView({ behavior: "smooth" });
-		}
-	};
 
 	return (
 		<section className={className}>
@@ -41,11 +35,11 @@ export default function ProductShowcaseSection({
 						{project.description}
 					</p>
 
-					{/* Botón Cotizar - Siempre visible */}
+					{/* Botón Cotizar */}
 					<div className="mt-10">
 						<QuoteButton
-							onClick={scrollToForm}
-							text="Cotizar este proyecto"
+							onClick={onQuoteClick}
+							text="Cotizar"
 							className="mt-4"
 						/>
 					</div>
