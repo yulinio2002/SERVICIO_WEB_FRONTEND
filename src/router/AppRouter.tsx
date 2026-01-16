@@ -8,7 +8,7 @@ import WhatsAppButton from "@components/common/WhatsAppButton";
 // Pages
 // import Home from "@/pages/Home";
 // import Nosotros from "@/pages/Nosotros";
-// import Servicios from "@/pages/Servicios";
+import Servicios from "@pages/Servicios";
 import ServicioDetalle from "@pages/ServicioDetalle";
 import NotFound from "@pages/NotFound.tsx";
 // import Proyectos from "@/pages/Proyectos";
@@ -21,12 +21,16 @@ const AppRouter: React.FC = () => {
 		<BrowserRouter>
 			<div className="flex flex-col min-h-screen">
 				<Header />
-				<main className="flex-grow">
+				<main
+					className="flex-grow px-5 md:px-7 lg:px-16"
+					style={{ paddingTop: "var(--header-height)" }}
+				>
 					<Routes>
 						{/* <Route path="/" element={<Home />} />
 						<Route path="/nosotros" element={<Nosotros />} />
 						<Route path="/servicios" element={<Servicios />} /> */}
-						<Route path="/servicios/" element={<ServicioDetalle />} />
+						<Route path="/servicios" element={<Servicios />} />
+						<Route path="/servicios/:slug" element={<ServicioDetalle />} />
 						{/* <Route path="/proyectos" element={<Proyectos />} />
 						<Route path="/contacto" element={<Contacto />} />
 						<Route path="/funcionalidad" element={<Funcionalidad />} />

@@ -22,20 +22,23 @@ const Header: React.FC = () => {
 	];
 
 	return (
-		<header className="fixed w-full top-0 bg-white z-50 shadow-sm">
-			<div className="container">
+		<header
+			className="fixed w-full top-0 bg-white z-50 shadow-sm"
+			style={{ height: "var(--header-height)" }}
+		>
+			<div className="container px-5 md:px-7 lg:px-8">
 				<div className="flex py-3 2xl:py-6 justify-between relative items-center">
 					{/* Logo */}
 					<Link to="/" className="flex items-center mb-0">
 						<img
 							src="/images/logo.jpeg"
-							className="h-14 lg:h-14 2xl:h-20 w-auto"
+							className="h-14 lg:h-16 2xl:h-20 w-auto"
 							alt="Oleohidraulics"
 						/>
 					</Link>
 
 					{/* Desktop Navigation */}
-					<nav className="hidden lg:flex flex-wrap font-medium lg:items-center text-sm 2xl:text-xl lg:justify-center">
+					<nav className="flex flex-wrap font-medium items-center justify-center text-sm md:text-base lg:text-lg 2xl:text-xl">
 						{navItems.map((item) => (
 							<React.Fragment key={item.label}>
 								{item.hasDropdown ? (

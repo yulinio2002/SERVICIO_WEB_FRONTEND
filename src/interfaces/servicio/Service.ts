@@ -3,7 +3,6 @@ export interface Service {
 	id: number;
 	title: string;
 	slug: string;
-	subtitle: string;
 	description: string;
 	content: string;
 	features: string[];

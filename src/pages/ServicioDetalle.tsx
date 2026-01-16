@@ -29,7 +29,6 @@ const ServicioDetalle: React.FC = () => {
 				id: 3,
 				title: 'Diseño y Consultoría',
 				slug: 'diseno-y-consultoria',
-				subtitle: 'NUESTROS SERVICIOS',
 				description: '¿Tu proyecto necesita hidráulica?',
 				content: `Contacta con nosotros, desde el primer paso te guiaremos desde la etapa conceptual o ingeniería básica y a través de todo el proceso de diseño. Nuestro Staff de profesionales lo guiaran hasta obtener la mejor solución a su necesidad.`,
 				features: [
@@ -43,7 +42,7 @@ const ServicioDetalle: React.FC = () => {
 					'CAD 3D',
 					'Documentación técnica',
 				],
-				images: ['/images/service-banner.jpg'],
+				images: ['/images/img1.jpg'],
 				galleryImages: [
 					{ id: 1, url: '/images/img1.jpg', alt: 'Proyecto 1' },
 					{ id: 2, url: '/images/img2.jpg', alt: 'Proyecto 2' },
@@ -105,10 +104,13 @@ const ServicioDetalle: React.FC = () => {
 			{/* Service Content */}
 			<section className="bg-white">
 				<div className="container">
-					<p className="subtitle text-center mb-4 2xl:mb-5">{service.subtitle}</p>
-					<h1 className="title-xl text-center w-full max-w-4xl m-auto mb-6 2xl:mb-7">
+					<p className="mt-6 text-center text-lg font-extrabold tracking-widest">
+						Nuestro Servicio
+					</p>
+
+					<p className="title-xl text-center font-extrabold text-1xl sm:text-2xl lg:text-3xl w-full max-w-4xl m-auto mb-6 2xl:mb-7">
 						{service.title}
-					</h1>
+					</p>
 					<div className="html max-w-6xl m-auto text-center mb-10">
 						<p className="mb-4">{service.description}</p>
 						<p className="mb-6">{service.content}</p>
@@ -122,14 +124,11 @@ const ServicioDetalle: React.FC = () => {
 						</ul>
 					</div>
 					<div className="flex w-full justify-center">
-						<button
-							onClick={scrollToForm}
-							className="flex items-center group"
-						>
+						<button onClick={scrollToForm} className="flex items-center group">
 							<div className="view-more">
-								<span>Cotizar</span>
-								<div>
-									<i className="las la-angle-right"></i>
+								<span>Cotizar </span>
+								<div className="h-6 w-6 rounded-full bg-blue-900 flex items-center justify-center ml-3 group-hover:bg-orange-600 transition-colors duration-300">
+									<i className="las la-angle-right text-white text-xs"></i>
 								</div>
 							</div>
 						</button>

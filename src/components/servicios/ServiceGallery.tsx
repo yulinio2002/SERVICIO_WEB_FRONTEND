@@ -54,9 +54,9 @@ const ServiceGallery: React.FC<ServiceGalleryProps> = ({ images }) => {
 	return (
 		<section className="bg-white pt-10 md:pt-0">
 			<div className="container">
-				<h2 className="title text-center md:text-left mb-8 lg:mb-12 2xl:mb-20">
+				<p className="mt-8 mb-8 text-left font-extrabold tracking-tight text-1xl sm:text-2xl lg:text-3xl mx-auto">
 					Galería de fotos
-				</h2>
+				</p>
 				<div className="w-full relative">
 					<div className="swiper swiper-gallery">
 						<div className="swiper-wrapper">

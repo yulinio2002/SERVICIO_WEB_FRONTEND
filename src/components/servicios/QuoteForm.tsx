@@ -120,19 +120,22 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 		<section className="bg-white pt-0 pb-0" id="form">
 			<div className="container">
 				<div className="bg-gradient-to-r from-grad-primary to-grad-secondary w-full rounded-2xl py-10 px-7 sm:py-12 sm:px-16 md:py-14 xl:py-28 xl:px-24">
-					<p className="subtitle text-center mb-4 2xl:mb-7 text-white">
+					<p className="mt-6 text-center text-lg font-bold tracking-widest">
 						COTIZA CON NOSOTROS
 					</p>
-					<h2 className="title text-center mb-14 2xl:mb-20 text-white">
+					<p className="mt-6 text-center text-2xl font-extrabold tracking-widest">
 						Estamos listos para ayudarte
-					</h2>
+					</p>
 
-					<form onSubmit={handleSubmit}>
+					<form
+						onSubmit={handleSubmit}
+						className="bg-gradient-to-r from-orange-50 to-blue-50 p-6 rounded-lg"
+					>
 						<div className="grid grid-cols-1 lg:grid-cols-2 gap-y-6 gap-x-10 lg:gap-x-24">
 							{/* Service Title */}
 							<div>
 								<div className="border-b border-gray-350 leading-tight">
-									<div className="font-bold py-2 text-white">
+									<div className="font-bold py-2 text-black">
 										{serviceTitle}
 									</div>
 								</div>
@@ -146,7 +149,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 									name="company"
 									value={formData.company}
 									onChange={handleChange}
-									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-white placeholder-gray-200 focus:outline-none focus:border-white"
+									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-black placeholder-gray-700 focus:outline-none focus:border-white"
 								/>
 							</div>
 
@@ -158,10 +161,10 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 									name="firstName"
 									value={formData.firstName}
 									onChange={handleChange}
-									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-white placeholder-gray-200 focus:outline-none focus:border-white"
+									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-black placeholder-gray-700 focus:outline-none focus:border-white"
 								/>
 								{errors.firstName && (
-									<p className="text-red-300 text-sm mt-1">
+									<p className="text-red-500 text-sm mt-1">
 										{errors.firstName}
 									</p>
 								)}
@@ -175,10 +178,10 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 									name="lastName"
 									value={formData.lastName}
 									onChange={handleChange}
-									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-white placeholder-gray-200 focus:outline-none focus:border-white"
+									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-black placeholder-gray-700 focus:outline-none focus:border-white"
 								/>
 								{errors.lastName && (
-									<p className="text-red-300 text-sm mt-1">{errors.lastName}</p>
+									<p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
 								)}
 							</div>
 
@@ -190,10 +193,10 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 									name="phone"
 									value={formData.phone}
 									onChange={handleChange}
-									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-white placeholder-gray-200 focus:outline-none focus:border-white"
+									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-black placeholder-gray-700 focus:outline-none focus:border-white"
 								/>
 								{errors.phone && (
-									<p className="text-red-300 text-sm mt-1">{errors.phone}</p>
+									<p className="text-red-500 text-sm mt-1">{errors.phone}</p>
 								)}
 							</div>
 
@@ -205,10 +208,10 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 									name="email"
 									value={formData.email}
 									onChange={handleChange}
-									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-white placeholder-gray-200 focus:outline-none focus:border-white"
+									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-black placeholder-gray-700 focus:outline-none focus:border-white"
 								/>
 								{errors.email && (
-									<p className="text-red-300 text-sm mt-1">{errors.email}</p>
+									<p className="text-red-500 text-sm mt-1">{errors.email}</p>
 								)}
 							</div>
 
@@ -220,13 +223,13 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 									placeholder="Mensaje"
 									value={formData.message}
 									onChange={handleChange}
-									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-white placeholder-gray-200 focus:outline-none focus:border-white resize-none"
+									className="w-full px-4 py-2 border-b border-gray-350 bg-transparent text-black placeholder-gray-700 focus:outline-none focus:border-white resize-none"
 								/>
 							</div>
 
 							{/* Privacy Policy */}
 							<div className="col-span-1 lg:col-span-2 mb-5">
-								<label className="flex justify-center items-center text-white">
+								<label className="flex justify-center items-center text-black">
 									<input
 										type="checkbox"
 										name="privacyPolicyAndDataUse"
@@ -239,7 +242,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 										<a
 											href="/politica-de-privacidad"
 											target="_blank"
-											className="font-bold border-b border-white"
+											className="font-bold border-b border-black"
 										>
 											Política de Privacidad
 										</a>{" "}
@@ -247,14 +250,14 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 										<a
 											href="/uso-de-datos"
 											target="_blank"
-											className="font-bold border-b border-white"
+											className="font-bold border-b border-black"
 										>
 											Uso de Datos
 										</a>
 									</span>
 								</label>
 								{errors.privacyPolicyAndDataUse && (
-									<p className="text-red-300 text-sm mt-1 text-center">
+									<p className="text-red-500 text-sm mt-1 text-center">
 										{errors.privacyPolicyAndDataUse}
 									</p>
 								)}
@@ -265,14 +268,9 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 								<button
 									type="submit"
 									disabled={loading}
-									className="flex items-center group disabled:opacity-50"
+									className="px-8 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
 								>
-									<div className="view-more">
-										<span>{loading ? "Enviando..." : "Enviar mensaje"}</span>
-										<div>
-											<i className="las la-angle-right"></i>
-										</div>
-									</div>
+									{loading ? "Enviando..." : "Enviar mensaje"}
 								</button>
 							</div>
 						</div>

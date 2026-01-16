@@ -34,7 +34,7 @@ const Footer: React.FC = () => {
 
 	return (
 		<footer className="bg-white">
-			<div className="container">
+			<div className="container px-5 md:px-7 lg:px-8">
 				{/* Main Footer Content */}
 				<div className="grid grid-cols-1 lg:grid-cols-12 pb-10 lg:pb-16 gap-y-6 lg:gap-14">
 					{/* Contact Section */}
@@ -120,7 +120,7 @@ const Footer: React.FC = () => {
 						© {currentYear} Oleohidraulics Services S.A.C.. TODOS LOS DERECHOS
 						RESERVADOS.
 					</p>
-					<a
+					{/*<a
 						href="https://www.agenciamk.com/"
 						target="_blank"
 						rel="noopener noreferrer"
@@ -136,7 +136,7 @@ const Footer: React.FC = () => {
 								e.currentTarget.style.display = "none";
 							}}
 						/>
-					</a>
+					</a> */}
 				</div>
 			</div>
 		</footer>
