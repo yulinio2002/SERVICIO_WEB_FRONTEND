@@ -7,4 +7,17 @@
 	--color-primary: #7955B4;
 	--color-secondary: #D9D9D9;
 	--color-tertiary: #292929;
+	--header-height: 76px;
+	}
+
+@media (min-width: 1024px) {
+	:root {
+		--header-height: 100px;
+	}
+}
+
+@media (min-width: 1536px) {
+	:root {
+		--header-height: 120px;
+	}
 }
