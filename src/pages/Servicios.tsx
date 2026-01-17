@@ -55,23 +55,6 @@ const Servicios: React.FC = () => {
 						y diseñar la mejor solución a sus sistemas oleohidráulicos.
 					</p>
 
-					{/* Two big images
-					<div className="mt-14 grid grid-cols-1 md:grid-cols-2 gap-8">
-						<div className="overflow-hidden rounded-[28px]">
-							<img
-								src="/images/services/hero-left.jpg"
-								alt="Servicio - imagen 1"
-								className="w-full h-[260px] sm:h-[320px] object-cover"
-							/>
-						</div>
-						<div className="overflow-hidden rounded-[28px]">
-							<img
-								src="/images/services/hero-right.jpg"
-								alt="Servicio - imagen 2"
-								className="w-full h-[260px] sm:h-[320px] object-cover"
-							/>
-						</div>
-					</div> */}
 				</div>
 			</section>
 

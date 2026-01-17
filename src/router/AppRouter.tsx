@@ -12,10 +12,9 @@ import Servicios from "@pages/Servicios";
 import ServicioDetalle from "@pages/ServicioDetalle";
 import NotFound from "@pages/NotFound.tsx";
 import Projects from "@pages/Projects.tsx";
-// import Proyectos from "@/pages/Proyectos";
-// import Contacto from "@/pages/Contacto";
-// import Funcionalidad from "@/pages/Funcionalidad";
-// import Marcas from "@/pages/Marcas";
+import Productos from "@pages/Productos.tsx";
+import ProductosCategoria from "@pages/ProductosCategoria.tsx";
+import ProductoDetalle from "@pages/ProductoDetalle.tsx";
 
 const AppRouter: React.FC = () => {
 	return (
@@ -33,8 +32,10 @@ const AppRouter: React.FC = () => {
 						<Route path="/servicios" element={<Servicios />} />
 						<Route path="/servicios/:slug" element={<ServicioDetalle />} />
 						<Route path="/proyectos" element={<Projects />} />
+						<Route path="/productos" element={<Productos />} />
+						<Route path="/productos/:slug" element={<ProductosCategoria />} />
+						<Route path="/producto/:slug" element={<ProductoDetalle />} />
 						{/*<Route path="/contacto" element={<Contacto />} />
-						<Route path="/funcionalidad" element={<Funcionalidad />} />
 						<Route path="/funcionalidad/:slug" element={<Funcionalidad />} />
 						<Route path="/marcas" element={<Marcas />} />
 						<Route path="/marcas/:slug" element={<Marcas />} /> */}

@@ -99,7 +99,7 @@ const ProductsDropdown: React.FC<ProductsDropdown> = ({ onClose }) => {
 						{/* Ver Productos Link */}
 						<div className="col-span-12">
 							<Link
-								to="/funcionalidad"
+								to="/productos"
 								className="absolute right-14 bottom-8 flex items-center"
 								onClick={onClose}
 							>
