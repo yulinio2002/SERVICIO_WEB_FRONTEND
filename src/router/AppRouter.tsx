@@ -5,15 +5,16 @@ import Header from "@components/common/Header";
 import Footer from "@components/common/Footer";
 import WhatsAppButton from "@components/common/WhatsAppButton";
 
+
 // Pages
-// import Home from "@/pages/Home";
-// import Nosotros from "@/pages/Nosotros";
+ import Home from "@pages/Home.tsx";
+import Nosotros from "@pages/Nosotros.tsx";
 import Servicios from "@pages/Servicios";
 import ServicioDetalle from "@pages/ServicioDetalle";
 import NotFound from "@pages/NotFound.tsx";
 import Projects from "@pages/Projects.tsx";
 // import Proyectos from "@/pages/Proyectos";
-// import Contacto from "@/pages/Contacto";
+ import Contacto from "@pages/Contacto";
 // import Funcionalidad from "@/pages/Funcionalidad";
 // import Marcas from "@/pages/Marcas";
 
@@ -30,9 +31,12 @@ const AppRouter: React.FC = () => {
 						{/* <Route path="/" element={<Home />} />
 						<Route path="/nosotros" element={<Nosotros />} />
 						<Route path="/servicios" element={<Servicios />} /> */}
+						<Route path="/" element={<Home />} />
+						<Route path="/nosotros" element={<Nosotros />} />
 						<Route path="/servicios" element={<Servicios />} />
 						<Route path="/servicios/:slug" element={<ServicioDetalle />} />
 						<Route path="/proyectos" element={<Projects />} />
+						<Route path="/contacto" element={<Contacto />} />
 						{/*<Route path="/contacto" element={<Contacto />} />
 						<Route path="/funcionalidad" element={<Funcionalidad />} />
 						<Route path="/funcionalidad/:slug" element={<Funcionalidad />} />
