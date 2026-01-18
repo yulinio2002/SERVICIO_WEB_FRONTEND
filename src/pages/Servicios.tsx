@@ -1,6 +1,6 @@
 // src/pages/Servicios.tsx
 import React from "react";
-import type { ServiceSummary } from "@interfaces/servicio/Service";
+import type { ServiceSummary } from "@interfaces/servicio/Service.ts";
 import ServiceList from "@components/servicios/ServiceList";
 
 const Servicios: React.FC = () => {

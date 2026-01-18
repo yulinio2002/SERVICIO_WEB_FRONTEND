@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ServiceGallery from '@components/servicios/ServiceGallery';
 import QuoteForm from '@components/servicios/QuoteForm';
-import type { Service } from '@interfaces/servicio/Service';
+import type { Service } from '@interfaces/servicio/Service.ts';
 import QuoteButton from "@components/common/QuoteButton.tsx";
 
 const ServicioDetalle: React.FC = () => {
