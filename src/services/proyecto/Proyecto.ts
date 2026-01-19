@@ -16,7 +16,7 @@ export async function listarProyectos(): Promise<ProjectType[]> {
 			const res = await api.get<null, unknown[]>({ url: `/api/proyectos` });
 			return mapearListaProyectosBackendAProjectTypes(res.data);
 		},
-		CACHE_OPTS,
+		CACHE_OPTS.ttlMs,
 	);
 }
 
@@ -28,7 +28,7 @@ export async function obtenerProyecto(id: number): Promise<ProjectType> {
 			const res = await api.get<null, unknown>({ url: `/api/proyectos/${id}` });
 			return mapearProyectoBackendAProjectType(res.data, 0);
 		},
-		CACHE_OPTS,
+		CACHE_OPTS.ttlMs,
 	);
 }
 
@@ -37,8 +37,5 @@ export function cacheSeleccionProyecto(selection: {
 	id: number;
 	title: string;
 }) {
-	cacheSet("proyectos:lastSelection", selection, {
-		ttlMs: 10 * 60 * 1000,
-		persist: true,
-	});
+	cacheSet("proyectos:lastSelection", selection, 10 * 60 * 1000);
 }

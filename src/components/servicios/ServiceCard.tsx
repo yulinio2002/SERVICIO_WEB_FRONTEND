@@ -6,7 +6,7 @@ interface ServiceCardProps {
 	id: number;
 	title: string;
 	slug: string;
-	description: string;
+	description?: string;
 	image: string;
 }
 

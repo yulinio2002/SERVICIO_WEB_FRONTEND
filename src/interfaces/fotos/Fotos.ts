@@ -1,10 +1,10 @@
-import { Servicio } from "@interfaces/servicio/Service.ts";
+import { Service } from "@interfaces/servicio/Service.ts";
 import { Proyecto } from "@interfaces/project/Proyecto";
 
 export interface Foto {
 	id?: number;
 	imagenUrl: string;
-	servicio?: Servicio | null;
+	servicio?: Service | null;
 	proyectos?: Proyecto | null;
 }
 

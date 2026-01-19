@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   const [empresa, setEmpresa] = useState<Empresa | null>(null);
-  const [loadingEmpresa, setLoadingEmpresa] = useState(true);
+	const [, setLoadingEmpresa] = useState(true);
 
   const [users, setUsers] = useState<UserWithContact[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
