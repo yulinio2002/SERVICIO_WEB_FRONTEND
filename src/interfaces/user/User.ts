@@ -10,24 +10,24 @@ export interface User {
 	persona: Persona;
 }
 
-// Para login
-export interface LoginRequest {
-	email: string;
-	password: string;
-}
-
 // Para registro
 export interface RegisterRequest {
 	email: string;
 	password: string;
-	address?: string;
+	direccion?: string;
+	persona: Omit<Persona, "id">;
+}
+
+// Para registro
+export interface allUserRequest {
+	email: string;
+	password: string;
+	direccion?: string;
 	persona: Omit<Persona, "id">;
 }
 
 // Para actualizar usuario
 export interface UserUpdate {
 	email?: string;
-	address?: string | null;
-	roles?: Role[];
-	persona?: Partial<Persona>;
+	telefono?: string;
 }

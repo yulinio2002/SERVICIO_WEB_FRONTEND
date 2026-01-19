@@ -1,32 +1,55 @@
 // src/components/common/Footer.tsx
 import React from "react";
+import {useState, useEffect} from "react";
 import { Link } from "react-router-dom";
+import { listarEmpresas } from "../../services/Empresa"; // Ajusta la ruta según tu estructura
+import type { Empresa } from "../../interfaces/empresa/Empresa"; // Ajusta la ruta según tu estructura
+
 
 const Footer: React.FC = () => {
 	const currentYear = new Date().getFullYear();
+	const [empresa, setEmpresa] = useState<Empresa | null>(null);
+    const [loading, setLoading] = useState(true);
+
+ useEffect(() => {
+	const fetchEmpresa = async () => {
+	  try {
+		const empresas = await listarEmpresas();
+		if (empresas.length > 0) {
+		  setEmpresa(empresas[0]); // Tomar la primera empresa
+		}
+	  } catch (error) {
+		console.error("Error al cargar datos de la empresa:", error);
+	  } finally {
+		setLoading(false);
+	  }
+	};
+
+	fetchEmpresa();
+  }, []);
 
 	const socialMedia = [
 		{
 			name: "Facebook",
-			url: "https://www.facebook.com/oleohidraulicservices/",
+			url: "#",
 			icon: "lab la-facebook-f",
 			faIcon: "fab fa-facebook-f", // Font Awesome alternativo
 		},
 		{
 			name: "Twitter",
-			url: "https://twitter.com/Oleohidraulics",
+			url: "#",
 			icon: "lab la-twitter",
 			faIcon: "fab fa-twitter",
 		},
 		{
 			name: "Instagram",
-			url: "https://www.instagram.com/oleohidraulic_services/",
+			url: "#",
 			icon: "lab la-instagram",
 			faIcon: "fab fa-instagram",
 		},
 		{
 			name: "LinkedIn",
-			url: "https://www.linkedin.com/company/oleohidraulics-services-s-a-c/",
+			url: "#",
 			icon: "lab la-linkedin-in",
 			faIcon: "fab fa-linkedin-in",
 		},
@@ -42,7 +65,7 @@ const Footer: React.FC = () => {
 						<h4 className="font-bold xl:text-lg mb-6 2xl:mb-8">Contáctanos</h4>
 						<div className="w-full flex flex-wrap space-y-4">
 							<p className="w-full">
-								Calle Carlos Gutierrez Noriega 185 La Victoria, Lima - Perú.
+								{empresa?.direccion || "Información no disponible"}
 							</p>
 							<p className="w-full">ventas@oleohidraulic.com</p>
 							<p className="w-full">lbravo@oleohidraulic.com</p>
@@ -117,7 +140,7 @@ const Footer: React.FC = () => {
 				{/* Copyright Section */}
 				<div className="border-t flex flex-col space-y-2 text-center md:space-y-0 md:flex-row md:justify-between py-3">
 					<p className="text-xs">
-						© {currentYear} Oleohidraulics Services S.A.C.. TODOS LOS DERECHOS
+						© {currentYear} A&D Oleohidraulicos S.A.C.. TODOS LOS DERECHOS
 						RESERVADOS.
 					</p>
 					{/*<a

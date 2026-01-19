@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Swiper from "swiper";
 import { Autoplay, EffectFade, Navigation } from "swiper/modules";
 
@@ -7,6 +7,8 @@ import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 
 import Container from "../components/common/Container";
+import { listarEmpresas } from "../services/Empresa"; // Ajusta la ruta según tu estructura
+import type { Empresa } from "../interfaces/empresa/Empresa"; // Ajusta la ruta según tu estructura
 import "../styles/Nosotros.css";
 
 const values = [
@@ -22,10 +24,29 @@ const values = [
 
 const Nosotros = () => {
   const swiperRef = useRef<Swiper | null>(null);
+  const [empresa, setEmpresa] = useState<Empresa | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEmpresa = async () => {
+      try {
+        const empresas = await listarEmpresas();
+        if (empresas.length > 0) {
+          setEmpresa(empresas[0]); // Tomar la primera empresa
+        }
+      } catch (error) {
+        console.error("Error al cargar datos de la empresa:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmpresa();
+  }, []);
 
   useEffect(() => {
     // Evita doble init en dev (React StrictMode)
-    if (swiperRef.current) return;
+     if (loading || swiperRef.current) return;
 
     const instance = new Swiper(".swiper-galery", {
       modules: [Navigation, Autoplay, EffectFade],
@@ -51,7 +72,11 @@ const Nosotros = () => {
       swiperRef.current?.destroy(true, true);
       swiperRef.current = null;
     };
-  }, []);
+  }, [loading]);
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
 
   return (
     <div className="nosotros">
@@ -67,14 +92,7 @@ const Nosotros = () => {
               </h1>
 
               <p className="nosotros-text">
-                Oleohidraulics Services S.A.C. es una empresa con más de 14 años de experiencia en el
-                mercado, especializada en mantenimiento, fabricación y comercialización de equipos y
-                sistemas oleo-hidráulicos.
-              </p>
-
-              <p className="nosotros-text">
-                Asimismo, contamos con servicios de mecanizado de precisión (CNC), área de diseño y
-                proyectos especializados para planificar la mejor solución a sus problemas hidráulicos.
+                {empresa?.nosotros || "Información no disponible"}
               </p>
 
               <ul className="nosotros-policies">
@@ -143,17 +161,14 @@ const Nosotros = () => {
               <div>
                 <h2>Nuestra Misión</h2>
                 <p>
-                  Brindar SOLUCIONES a las necesidades y expectativas de nuestros clientes, ofreciéndoles
-                  resultados rápidos y de calidad. A su vez garantizando eficacia, eficiencia y
-                  efectividad en la entrega de nuestros servicios.
+                  {empresa?.mision || "Información no disponible"}
                 </p>
               </div>
 
               <div>
                 <h2>Nuestra Visión</h2>
                 <p>
-                  Llegar a ser una empresa líder a nivel nacional en el campo Oleo hidráulico, buscando
-                  siempre la mejor solución de acorde a las necesidades de nuestros clientes.
+                  {empresa?.vision || "Información no disponible"}
                 </p>
               </div>
             </div>

@@ -5,102 +5,70 @@ import { useAuthContext } from "@contexts/AuthContext";
 import { getRoleBasedOnToken } from "../../utils/getRoleBasedOnToken";
 
 export default function LoginForm() {
-	const [formData, setFormData] = useState<LoginRequest>({
-		email: "",
-		password: ""
-	});
+	const [formData, setFormData] = useState<LoginRequest>({ email: "", password: "" });
 	const [error, setError] = useState<string>("");
-	const [successMessage, setSuccessMessage] = useState<string>("");
 	const navigate = useNavigate();
 	const { login } = useAuthContext();
 
 	function handleChange(e: ChangeEvent<HTMLInputElement>) {
 		const { name, value } = e.target;
-		setFormData(prev => ({
-			...prev,
-			[name]: value
-		}));
+		setFormData(prev => ({ ...prev, [name]: value }));
 	}
 
 	async function handleSubmit(e: FormEvent) {
 		e.preventDefault();
 		setError("");
-		setSuccessMessage("");
 
 		try {
 			await login(formData);
-
-			// Redirigir inmediatamente según el rol, sin setTimeout
 			const role = getRoleBasedOnToken();
-			if (role === "ROLE_PROVEEDOR") {
-				navigate("/servicios", { replace: true });
-			} else if (role === "ROLE_CLIENTE") {
-				navigate("/serviciosCliente", { replace: true });
+			if (role === "ROLE_ADMIN") {
+				navigate("/admin", { replace: true });
 			} else {
-				// Fallback si no se puede determinar el rol
-				navigate("/", { replace: true });
+				setError("Solo se permite el rol ADMIN");
 			}
-		} catch (error: any) {
-			setError(error.response?.data?.message || "Error al iniciar sesión");
+		} catch (err: any) {
+			setError(err.response?.data?.message || "Error al iniciar sesión");
 		}
 	}
 
 	return (
-		<div className="p-10">
-			<h2 className="text-gray-900 mb-8 text-2xl font-semibold">
-				Bienvenido a ServiMatch
-			</h2>
-			<form onSubmit={handleSubmit} className="space-y-5">
-				<div>
-					<label htmlFor="email" className="block mb-2 text-gray-700 font-medium text-sm">
-						Correo electrónico
-					</label>
-					<input
-						type="email"
-						name="email"
-						id="email"
-						value={formData.email}
-						onChange={handleChange}
-						placeholder="ejemplo@correo.com"
-						className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
-						required
-					/>
-				</div>
-
-				<div>
-					<label htmlFor="password" className="block mb-2 text-gray-700 font-medium text-sm">
-						Contraseña
-					</label>
-					<input
-						type="password"
-						name="password"
-						id="password"
-						value={formData.password}
-						onChange={handleChange}
-						placeholder="••••••••"
-						className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
-						required
-					/>
-				</div>
-
-				<button
-					type="submit"
-					className="w-full py-3.5 bg-blue-500 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 mt-3 hover:bg-blue-600"
-				>
-					Iniciar Sesión
-				</button>
-
-				{error && (
-					<div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-						{error}
+		<div className="min-h-screen flex items-center justify-center bg-gray-100">
+			<div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+				<h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Bienvenido a A&D Oleohidraulicos</h2>
+				<form onSubmit={handleSubmit} className="space-y-6">
+					<div>
+						<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Correo electrónico</label>
+						<input
+							type="email"
+							name="email"
+							id="email"
+							value={formData.email}
+							onChange={handleChange}
+							placeholder="ejemplo@correo.com"
+							required
+							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+						/>
 					</div>
-				)}
-				{successMessage && (
-					<div className="mt-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded">
-						{successMessage}
+					<div>
+						<label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+						<input
+							type="password"
+							name="password"
+							id="password"
+							value={formData.password}
+							onChange={handleChange}
+							placeholder="••••••••"
+							required
+							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+						/>
 					</div>
-				)}
-			</form>
+					<button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200">
+						Iniciar Sesión
+					</button>
+					{error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>}
+				</form>
+			</div>
 		</div>
 	);
 }
