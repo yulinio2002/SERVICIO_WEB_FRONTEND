@@ -2,7 +2,7 @@ export type ProductCategoryCard = {
 	id: number;
 	slug: string;
 	title: string;
-	marca?: string;
+	subtitle?: string;
 	image: {
 		src: string; // ruta local desde public: /images/products/...
 		alt: string;

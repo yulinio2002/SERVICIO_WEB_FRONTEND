@@ -10,32 +10,25 @@ const productCategories: ProductCategoryCard[] = [
 		id: 1,
 		slug: "abrazaderas",
 		title: "Abrazaderas",
-		marca: "D'ONOFRIO",
-		image: { src: "/images/products/abrazaderas.jpg", alt: "Abrazaderas" },
+		image: { src: "/images/img1.jpg", alt: "Abrazaderas" },
 	},
 	{
 		id: 2,
 		slug: "accesorios-hidraulicos",
 		title: "Accesorios Hidráulicos",
-		image: {
-			src: "/images/products/accesorios.jpg",
-			alt: "Accesorios Hidráulicos",
-		},
+		image: { src: "/images/img2.jpg", alt: "Accesorios Hidráulicos" },
 	},
 	{
 		id: 3,
 		slug: "acumuladores-hidraulicos",
 		title: "Acumuladores Hidráulicos",
-		image: {
-			src: "/images/products/acumuladores.jpg",
-			alt: "Acumuladores Hidráulicos",
-		},
+		image: { src: "/images/img3.jpg", alt: "Acumuladores Hidráulicos" },
 	},
-	// agrega más...
+	// agrega más categorías si quieres…
 ];
 
 export default function Productos() {
-	const pageSize = 6; // 3 columnas x 2 filas (como tu captura). Ajusta si quieres.
+	const pageSize = 6;
 
 	const { meta, goTo } = usePagination({
 		totalItems: productCategories.length,
@@ -48,7 +41,6 @@ export default function Productos() {
 		[meta.startIndex, meta.endIndex],
 	);
 
-	// Adaptamos meta interno al PaginationMeta que definiste
 	const paginationMeta: PaginationMeta = {
 		page: meta.page,
 		pageSize: meta.pageSize,
@@ -77,7 +69,6 @@ export default function Productos() {
 
 			<section className="pt-10 md:pt-14">
 				<div className="container">
-
 					<ProductCategoriesGrid items={visibleItems} />
 
 					<Pagination
