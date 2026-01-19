@@ -1,55 +1,46 @@
 // src/pages/Proyectos.tsx (ejemplo)
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProjectShowcaseSection from "@components/projects/ProjectShowcaseSection.tsx";
 import QuoteForm from "@components/servicios/QuoteForm";
 import { ProjectType } from "@interfaces/project/ProjectTypes.ts";
+import { listarProyectos } from "@services/proyecto/Proyecto.ts";
 
 const Projects: React.FC = () => {
-	// Estado para el proyecto seleccionado
 	const [selectedProject, setSelectedProject] = useState<{
 		title: string;
 		id: number;
 	} | null>(null);
+	const [projects, setProjects] = useState<ProjectType[]>([]);
+	const [loading, setLoading] = useState(true);
 
-	const projects: ProjectType[] = [
-		{
-			id: 1,
-			slug: "proyecto-1",
-			title: "Proyecto Hidráulico Industrial",
-			description: "Sistema hidráulico completo para máquina industrial...",
-			image: {
-				src: "/images/img1.jpg",
-				alt: "Proyecto 1",
-			},
-			layout: "imageRight",
-		},
-		{
-			id: 2,
-			slug: "proyecto-2",
-			title: "Sistema Oleohidráulico Móvil",
-			description: "Implementación de sistema hidráulico para maquinaria móvil...",
-			image: {
-				src: "/images/img2.jpg",
-				alt: "Proyecto 2",
-			},
-			layout: "imageLeft",
-		},
-		// Agrega más proyectos aquí...
-	];
+	useEffect(() => {
+		let mounted = true;
+		(async () => {
+			setLoading(true);
+			try {
+				const data = await listarProyectos();
+				if (mounted) setProjects(data);
+			} catch (e) {
+				console.error("Error cargando proyectos:", e);
+			} finally {
+				if (mounted) setLoading(false);
+			}
+		})();
+		return () => {
+			mounted = false;
+		};
+	}, []);
 
-	// Función para manejar la selección de proyecto
 	const handleProjectSelect = (project: ProjectType) => {
-		setSelectedProject({
-			title: project.title,
-			id: project.id
-		});
+		setSelectedProject({ title: project.title, id: project.id });
 
-		const formElement = document.getElementById('form');
-		if (formElement) {
-			formElement.scrollIntoView({ behavior: 'smooth' });
-		}
-	}
+		const formElement = document.getElementById("form");
+		if (formElement) formElement.scrollIntoView({ behavior: "smooth" });
+	};
 
+	const fallback =
+		selectedProject ??
+		(projects[0] ? { title: projects[0].title, id: projects[0].id } : null);
 
 	return (
 		<div className="pt-20">
@@ -67,29 +58,38 @@ const Projects: React.FC = () => {
 						Oleohidraulics Services contamos con profesionales idóneos y
 						capacitados, que les brindaran las mejores soluciones del mercado.
 						Nuestra área de ingeniería está capacitada para diseñar, construir e
-						instalar proyectos oleohidráulicos. <br/> Ponemos a su disposición equipos
-						de última generación para el Servicio de Remanufactura de Equipos
-						Hidráulicos.
+						instalar proyectos oleohidráulicos. <br /> Ponemos a su disposición
+						equipos de última generación para el Servicio de Remanufactura de
+						Equipos Hidráulicos.
 					</p>
 				</div>
 			</section>
 
 			{/* Sección de proyectos */}
 			<section className="container py-12">
-				{projects.map((project, index) => (
-					<ProjectShowcaseSection
-						key={project.id}
-						project={project}
-						onQuoteClick={() => handleProjectSelect(project)}
-						className={index > 0 ? "mt-20" : ""}
-					/>
-				))}
+				{loading && (
+					<div className="min-h-[200px] flex items-center justify-center">
+						<div className="text-center">
+							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-primary mx-auto"></div>
+							<p className="mt-4 text-gray-600">Cargando...</p>
+						</div>
+					</div>
+				)}
+
+				{!loading &&
+					projects.map((project, index) => (
+						<ProjectShowcaseSection
+							key={project.id}
+							project={project}
+							onQuoteClick={() => handleProjectSelect(project)}
+							className={index > 0 ? "mt-20" : ""}
+						/>
+					))}
 			</section>
 
-			<QuoteForm
-				serviceTitle={selectedProject?.title || projects[1].title}
-				serviceId={selectedProject?.id || projects[1].id}
-			/>
+			{fallback && (
+				<QuoteForm serviceTitle={fallback.title} serviceId={fallback.id} />
+			)}
 		</div>
 	);
 };

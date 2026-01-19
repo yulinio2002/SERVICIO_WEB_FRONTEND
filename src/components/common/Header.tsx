@@ -31,7 +31,7 @@ const Header: React.FC = () => {
 					{/* Logo */}
 					<Link to="/" className="flex items-center mb-0">
 						<img
-							src="/images/logo.jpeg"
+							src="/images/logo.jpg"
 							className="h-14 lg:h-16 2xl:h-20 w-auto"
 							alt="Oleohidraulics"
 						/>

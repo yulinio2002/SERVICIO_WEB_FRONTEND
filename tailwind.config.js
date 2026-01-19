@@ -8,6 +8,11 @@ export default {
 				secondary: "var(--color-secondary)",
 				tertiary: "var(--color-tertiary)",
 				"backgorund-color": "var(--color-background)",
+				"blue-primary": "#293a4a",
+				"gray-primary": "#666",
+				"orange-primary": "#ff6b35",
+				"grad-primary": "#4a90e2",
+				"grad-secondary": "#357abd",
 			},
 			fontFamily: {
 				sans: [

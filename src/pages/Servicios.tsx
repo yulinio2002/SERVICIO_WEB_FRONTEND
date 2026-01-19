@@ -1,39 +1,56 @@
 // src/pages/Servicios.tsx
-import React from "react";
-import type { ServiceSummary } from "@interfaces/servicio/Service";
+import React, { useEffect, useState } from "react";
+import type { ServiceSummary } from "@interfaces/servicio/Service.ts";
 import ServiceList from "@components/servicios/ServiceList";
+import { listarServicios } from "@services/servicio/Servicio.ts";
 
 const Servicios: React.FC = () => {
+
+	const [services, setServices] = useState<ServiceSummary[]>([]);
+
+	useEffect(() => {
+		let mounted = true;
+		(async () => {
+			try {
+				const data = await listarServicios();
+				if (mounted) setServices(data);
+			} catch (err) {
+				console.error("Error cargando servicios:", err);
+			}
+		})();
+		return () => {
+			mounted = false;
+		};
+	}, []);
+
+	{/* Mock data
 	const services: ServiceSummary[] = [
 		{
 			id: 1,
 			title: "Fabricación de Sistemas",
 			slug: "fabricacion-de-sistemas",
-			description: "",
 			image: "/images/img1.jpg",
 		},
 		{
 			id: 2,
 			title: "Control y Automatización",
 			slug: "control-y-automatizacion",
-			description: "",
 			image: "/images/img2.jpg",
 		},
 		{
 			id: 3,
 			title: "Fabricación de Piezas a Medida",
 			slug: "fabricacion-de-piezas-a-medida",
-			description: "",
 			image: "/images/img3.jpg",
 		},
 		{
 			id: 4,
 			title: "Suministro e Instalación de Tuberías",
 			slug: "suministro-e-instalacion-de-tuberias",
-			description: "",
 			image: "/images/img1.jpg",
 		},
 	];
+	*/	}
 
 	return (
 		<div className="bg-white">

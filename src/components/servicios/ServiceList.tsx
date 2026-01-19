@@ -1,7 +1,7 @@
 // src/components/servicios/ServiceList.tsx
 import React from "react";
 import ServiceCard from "./ServiceCard";
-import type { ServiceSummary } from "@interfaces/servicio/Service";
+import type { ServiceSummary } from "@interfaces/servicio/Service.ts";
 
 interface ServiceListProps {
 	services: ServiceSummary[];
