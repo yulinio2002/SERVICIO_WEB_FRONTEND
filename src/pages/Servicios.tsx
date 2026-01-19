@@ -1,9 +1,29 @@
 // src/pages/Servicios.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import type { ServiceSummary } from "@interfaces/servicio/Service.ts";
 import ServiceList from "@components/servicios/ServiceList";
+import { listarServicios } from "@services/servicio/Servicio.ts";
 
 const Servicios: React.FC = () => {
+
+	const [services, setServices] = useState<ServiceSummary[]>([]);
+
+	useEffect(() => {
+		let mounted = true;
+		(async () => {
+			try {
+				const data = await listarServicios();
+				if (mounted) setServices(data);
+			} catch (err) {
+				console.error("Error cargando servicios:", err);
+			}
+		})();
+		return () => {
+			mounted = false;
+		};
+	}, []);
+
+	{/* Mock data
 	const services: ServiceSummary[] = [
 		{
 			id: 1,
@@ -30,6 +50,7 @@ const Servicios: React.FC = () => {
 			image: "/images/img1.jpg",
 		},
 	];
+	*/	}
 
 	return (
 		<div className="bg-white">
