@@ -5,6 +5,7 @@ import ServiceGallery from '@components/servicios/ServiceGallery';
 import QuoteForm from '@components/servicios/QuoteForm';
 import type { Service } from '@interfaces/servicio/Service.ts';
 import QuoteButton from "@components/common/QuoteButton.tsx";
+import { obtenerServicio } from "@services/servicio/Servicio.ts";
 
 const ServicioDetalle: React.FC = () => {
 	const { slug } = useParams<{ slug: string }>();
@@ -23,10 +24,10 @@ const ServicioDetalle: React.FC = () => {
 		setLoading(true);
 		try {
 			// Aquí iría la llamada a tu API
-			// const data = await servicioService.getBySlug(slug);
+			const data = await obtenerServicio(1); // Reemplaza '1' con el ID real basado en el slug
 
 			// Mock data
-			const mockService: Service = {
+			{/* const mockService: Service = {
 				id: 3,
 				title: 'Diseño y Consultoría',
 				slug: 'diseno-y-consultoria',
@@ -50,8 +51,9 @@ const ServicioDetalle: React.FC = () => {
 					{ id: 3, url: '/images/img3.jpg', alt: 'Proyecto 3' },
 				],
 			};
+			*/}
 
-			setService(mockService);
+			setService(data);
 		} catch (error) {
 			console.error('Error fetching service:', error);
 		} finally {

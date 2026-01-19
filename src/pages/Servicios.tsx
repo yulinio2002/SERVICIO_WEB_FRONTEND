@@ -9,28 +9,24 @@ const Servicios: React.FC = () => {
 			id: 1,
 			title: "Fabricación de Sistemas",
 			slug: "fabricacion-de-sistemas",
-			description: "",
 			image: "/images/img1.jpg",
 		},
 		{
 			id: 2,
 			title: "Control y Automatización",
 			slug: "control-y-automatizacion",
-			description: "",
 			image: "/images/img2.jpg",
 		},
 		{
 			id: 3,
 			title: "Fabricación de Piezas a Medida",
 			slug: "fabricacion-de-piezas-a-medida",
-			description: "",
 			image: "/images/img3.jpg",
 		},
 		{
 			id: 4,
 			title: "Suministro e Instalación de Tuberías",
 			slug: "suministro-e-instalacion-de-tuberias",
-			description: "",
 			image: "/images/img1.jpg",
 		},
 	];
@@ -55,23 +51,6 @@ const Servicios: React.FC = () => {
 						y diseñar la mejor solución a sus sistemas oleohidráulicos.
 					</p>
 
-					{/* Two big images
-					<div className="mt-14 grid grid-cols-1 md:grid-cols-2 gap-8">
-						<div className="overflow-hidden rounded-[28px]">
-							<img
-								src="/images/services/hero-left.jpg"
-								alt="Servicio - imagen 1"
-								className="w-full h-[260px] sm:h-[320px] object-cover"
-							/>
-						</div>
-						<div className="overflow-hidden rounded-[28px]">
-							<img
-								src="/images/services/hero-right.jpg"
-								alt="Servicio - imagen 2"
-								className="w-full h-[260px] sm:h-[320px] object-cover"
-							/>
-						</div>
-					</div> */}
 				</div>
 			</section>
 
