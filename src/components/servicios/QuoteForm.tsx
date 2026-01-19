@@ -119,7 +119,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({ serviceTitle, serviceId }) => {
 	return (
 		<section className="bg-white pt-0 pb-0" id="form">
 			<div className="container">
-				<div className="bg-gradient-to-r from-grad-primary to-grad-secondary w-full rounded-2xl py-10 px-7 sm:py-12 sm:px-16 md:py-14 xl:py-28 xl:px-24">
+				<div className="w-full rounded-2xl py-10 px-7 sm:py-12 sm:px-16 md:py-14 xl:py-28 xl:px-24">
 					<p className="mt-6 text-center text-lg font-bold tracking-widest">
 						COTIZA CON NOSOTROS
 					</p>
