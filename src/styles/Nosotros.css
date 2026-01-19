@@ -67,7 +67,7 @@
   position: relative;
    max-width: 440px;   /* 👈 controla qué tan angosta es */
   margin-left: auto;
-  transform: translateY(-100px);   /* 👈 lo empuja hacia la derecha como en la referencia */
+  transform: translateY(-50px);   /* 👈 lo empuja hacia la derecha como en la referencia */
 }
 
 .swiper-galery {

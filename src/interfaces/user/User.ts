@@ -17,8 +17,7 @@ export interface RegisterRequest {
 	direccion?: string;
 	persona: Omit<Persona, "id">;
 }
-
-// Para registro
+// Para obtener todos los datos
 export interface allUserRequest {
 	email: string;
 	password: string;
@@ -30,4 +29,16 @@ export interface allUserRequest {
 export interface UserUpdate {
 	email?: string;
 	telefono?: string;
+}
+// Para la respuesta de /auth
+export interface AuthMeResponse {
+  id?: number;
+  email: string;
+  address?: string | null;
+  roles: Set<Role> | Role[];
+  persona: Persona & {
+    telefono?: string | null;
+    email?: string | null; // por si tu API maneja email en persona
+  };
+  telefono?: string | null; // por si tu API lo manda en root
 }

@@ -4,7 +4,6 @@ import Api from "@services/api";
 import { login } from "@services/auth/login";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { AuthMeDto } from "@interfaces/auth/AuthMeDto";
-import { getMeInfo } from "@services/auth/me";
 
 interface AuthContextType {
   login: (loginRequest: LoginRequest) => Promise<void>;
@@ -27,13 +26,8 @@ async function loginHandler(
   const response = await login(loginRequest);
   setSession(response.token);
   setUserId(response.id.toString());
-
-  try {
-    const userInfo = await getMeInfo();
-    setUserInfo(JSON.stringify(userInfo));
-  } catch (error) {
-    console.error("Error fetching user info after login:", error);
-  }
+  // No se requiere cargar información adicional del usuario
+  setUserInfo(null);
 }
 
 export function AuthProvider(props: { children: ReactNode }) {
@@ -63,21 +57,9 @@ export function AuthProvider(props: { children: ReactNode }) {
   }, [session]);
 
   const refreshUserInfo = async () => {
-    if (!session) return;
-    try {
-      const userInfo = await getMeInfo();
-      setUserInfo(JSON.stringify(userInfo));
-    } catch (error) {
-      console.error("Error refreshing user info:", error);
-    }
+    // No hay llamada necesaria; se mantiene la firma para compatibilidad
+    return;
   };
-
-  useEffect(() => {
-    if (session && !userInfo && !isLoading) {
-      refreshUserInfo();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, isLoading]);
 
   const logoutHandler = () => {
     setSession(null);

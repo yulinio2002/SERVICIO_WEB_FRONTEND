@@ -7,7 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 
 import Container from "../components/common/Container";
-import { listarEmpresas } from "../services/Empresa"; // Ajusta la ruta según tu estructura
+import { listarEmpresas } from "../services/empresa/Empresa"; // Ajusta la ruta según tu estructura
 import type { Empresa } from "../interfaces/empresa/Empresa"; // Ajusta la ruta según tu estructura
 import "../styles/Nosotros.css";
 
