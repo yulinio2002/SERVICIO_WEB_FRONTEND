@@ -1,44 +1,36 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect} from "react";
 import ProductCategoriesGrid from "@components/product/ProductCategoriesGrid";
 import type { ProductCategoryCard } from "@interfaces/product/ProductTypes";
 import { usePagination } from "@hooks/usePagination";
 import Pagination from "@components/common/Pagination";
 import type { PaginationMeta } from "@interfaces/product/ProductTypes";
+import { listarProductos } from "@services/producto/Producto.ts";
+import { buildCategoryCards } from "@interfaces/product/Mapper.ts";
 
-const productCategories: ProductCategoryCard[] = [
-	{
-		id: 1,
-		slug: "abrazaderas",
-		title: "Abrazaderas",
-		image: { src: "/images/img1.jpg", alt: "Abrazaderas" },
-	},
-	{
-		id: 2,
-		slug: "accesorios-hidraulicos",
-		title: "Accesorios Hidráulicos",
-		image: { src: "/images/img2.jpg", alt: "Accesorios Hidráulicos" },
-	},
-	{
-		id: 3,
-		slug: "acumuladores-hidraulicos",
-		title: "Acumuladores Hidráulicos",
-		image: { src: "/images/img3.jpg", alt: "Acumuladores Hidráulicos" },
-	},
-	// agrega más categorías si quieres…
-];
 
 export default function Productos() {
+	const [categories, setCategories] = useState<ProductCategoryCard[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		(async () => {
+			const products = await listarProductos();
+			setCategories(buildCategoryCards(products));
+			setLoading(false);
+		})();
+	}, []);
+
 	const pageSize = 6;
 
 	const { meta, goTo } = usePagination({
-		totalItems: productCategories.length,
+		totalItems: categories.length,
 		pageSize,
 		initialPage: 1,
 	});
 
 	const visibleItems = useMemo(
-		() => productCategories.slice(meta.startIndex, meta.endIndex),
-		[meta.startIndex, meta.endIndex],
+		() => categories.slice(meta.startIndex, meta.endIndex),
+		[categories, meta.startIndex, meta.endIndex],
 	);
 
 	const paginationMeta: PaginationMeta = {
@@ -47,6 +39,8 @@ export default function Productos() {
 		totalItems: meta.totalItems,
 		totalPages: meta.totalPages,
 	};
+
+	if (loading) return <div className="pt-20 text-center">Cargando...</div>;
 
 	return (
 		<div className="bg-white">

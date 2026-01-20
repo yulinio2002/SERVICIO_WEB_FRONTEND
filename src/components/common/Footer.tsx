@@ -71,7 +71,7 @@ const Footer: React.FC = () => {
 			  {/* Column 1: Address and Emails */}
 			  <div className="flex flex-col space-y-4">
 				<p>
-				  {empresa?.direccion || "Información no disponible"}
+				  {empresa?.direccion || "Dirección no disponible"}
 				</p>
 
 				{/* Emails desde API */}

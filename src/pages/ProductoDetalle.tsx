@@ -1,7 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import QuoteForm from "@components/servicios/QuoteForm";
 import type { ProductItem } from "@interfaces/product/ProductTypes";
+import { listarProductos } from "@services/producto/Producto.ts";
+import { slugify } from "@interfaces/product/Mapper.ts";
 
 type ProductDetail = ProductItem & {
 	bullets?: string[];
@@ -11,67 +13,63 @@ type ProductDetail = ProductItem & {
 const ProductoDetalle: React.FC = () => {
 	const { slug } = useParams<{ slug: string }>();
 
-	// data estática por slug (usa imágenes locales)
-	const products: Record<string, ProductDetail> = {
-		"bombas-de-desplazamiento-fijo": {
-			id: 101,
-			slug: "bombas-de-desplazamiento-fijo",
-			marca: "Atos",
-			title: "Bombas de Desplazamiento Fijo",
-			description:
-				"Bombas de paletas, pistones radiales y manuales para media / alta presión.",
-			content:
-				"Contamos con un amplio stock de los diversos tipos de Bombas de Desplazamiento Fijo.",
-			bullets: [
-				"Paletas hasta 150 cm³/rev",
-				"Pistones radiales hasta 25 cm³/rev",
-				"Manual hasta 20 cm³/rev",
-			],
-			image: { src: "/images/img2.jpg", alt: "Bombas de Desplazamiento Fijo" },
-			categorySlug: "accesorios-hidraulicos",
-			categoryTitle: "Accesorios Hidráulicos",
-			// brandLogoSrc: "/images/brands/atos.png", // si luego lo agregas
-			features: [],
-		},
+	const [product, setProduct] = useState<ProductDetail | null>(null);
+	const [loading, setLoading] = useState(true);
 
-		// Ejemplos adicionales (por si los usas desde la vista 2 actual)
-		"atos-conectores": {
-			id: 2,
-			slug: "atos-conectores",
-			marca: "Atos",
-			title: "Conectores",
-			description: "Conectores para aplicaciones industriales hidráulicas.",
-			content: "Modelos disponibles para distintas configuraciones y voltajes.",
-			bullets: ["Distintos formatos", "Alta durabilidad", "Uso industrial"],
-			image: { src: "/images/img2.jpg", alt: "Atos - Conectores" },
-			categorySlug: "accesorios-hidraulicos",
-			categoryTitle: "Accesorios Hidráulicos",
-			features: [],
-		},
+	useEffect(() => {
+		let mounted = true;
 
-		"omt-campanas-motor-bomba": {
-			id: 1,
-			slug: "omt-campanas-motor-bomba",
-			marca: "OMT",
-			title: "Campanas de Motor Bomba desde 0.75 HP - 150 HP",
-			description: "Campanas para motor bomba con diferentes capacidades.",
-			content: "Consúltanos por compatibilidad y disponibilidad.",
-			bullets: [
-				"Rango 0.75 HP - 150 HP",
-				"Materiales industriales",
-				"Alta precisión",
-			],
-			image: { src: "/images/img1.jpg", alt: "OMT - Campanas motor bomba" },
-			categorySlug: "accesorios-hidraulicos",
-			categoryTitle: "Accesorios Hidráulicos",
-			features: [],
-		},
-	};
+		(async () => {
+			if (!slug) {
+				setLoading(false);
+				return;
+			}
 
-	const product = useMemo(() => {
-		if (!slug) return null;
-		return products[slug] ?? null;
+			setLoading(true);
+
+			try {
+				// cacheado por tu service
+				const list = await listarProductos();
+
+				// slug = slugify(nombre) (como en tu mapper)
+				const found = list.find(
+					(p) => p.slug === slug || slugify(p.title) === slug,
+				);
+
+				if (!mounted) return;
+				setProduct(found ?? null);
+			} catch (e) {
+				console.error("Error cargando producto:", e);
+				if (mounted) setProduct(null);
+			} finally {
+				if (mounted) setLoading(false);
+			}
+		})();
+
+		return () => {
+			mounted = false;
+		};
 	}, [slug]);
+
+	const bullets = useMemo(() => {
+		//  en backend ya viene como array
+		return product?.features?.length ? product.features : [];
+	}, [product]);
+
+	if (loading) {
+		return (
+			<div className="pt-20">
+				<section className="container py-20">
+					<div className="min-h-[200px] flex items-center justify-center">
+						<div className="text-center">
+							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-primary mx-auto"></div>
+							<p className="mt-4 text-gray-600">Cargando...</p>
+						</div>
+					</div>
+				</section>
+			</div>
+		);
+	}
 
 	if (!product) {
 		return (

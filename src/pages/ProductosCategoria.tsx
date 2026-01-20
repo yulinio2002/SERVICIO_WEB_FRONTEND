@@ -1,64 +1,92 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ProductsListGrid from "@components/product/ProductsListGrid";
 import type { ProductItem } from "@interfaces/product/ProductTypes";
+import { listarProductosPorCategoria } from "@services/producto/Producto";
 
 const ProductosCategoria: React.FC = () => {
 	const { slug } = useParams<{ slug: string }>();
+	const [products, setProducts] = useState<ProductItem[]>([]);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
-	// ✅ data estática por categoría (usa imágenes locales)
-	const productsByCategory: Record<string, ProductItem[]> = {
-		"accesorios-hidraulicos": [
-			{
-				id: 1,
-				slug: "omt-campanas-motor-bomba",
-				marca: "OMT",
-				title: "CAMPANAS DE MOTOR BOMBA DESDE 0.75 HP -150 HP",
-				description: "",
-				content: "",
-				features: [],
-				image: { src: "/images/img1.jpg", alt: "OMT - Campanas motor bomba" },
-				categorySlug: "accesorios-hidraulicos",
-				categoryTitle: "Accesorios Hidráulicos",
-			},
-			{
-				id: 2,
-				slug: "atos-conectores",
-				marca: "Atos",
-				title: "Conectores",
-				description: "",
-				content: "",
-				features: [],
-				image: { src: "/images/img2.jpg", alt: "Atos - Conectores" },
-				categorySlug: "accesorios-hidraulicos",
-				categoryTitle: "Accesorios Hidráulicos",
-			},
-			{
-				id: 3,
-				slug: "atos-e-atr-8",
-				marca: "Atos",
-				title: "E-ATR-8",
-				description: "",
-				content: "",
-				features: [],
-				image: { src: "/images/img3.jpg", alt: "Atos - E-ATR-8" },
-				categorySlug: "accesorios-hidraulicos",
-				categoryTitle: "Accesorios Hidráulicos",
-			},
-		],
-	};
+	useEffect(() => {
+		const fetchProducts = async () => {
+			if (!slug) return;
 
-	const products = useMemo(() => {
-		if (!slug) return [];
-		return productsByCategory[slug] ?? [];
+			setLoading(true);
+			setError(null);
+
+			try {
+				// Convertir slug a formato enum (ej: "accesorios-hidraulicos" -> "ACCESORIOS_HIDRAULICOS")
+				const enumCategoria = slug.toUpperCase().replace("-", "_");
+				const data = await listarProductosPorCategoria(enumCategoria);
+				setProducts(data);
+			} catch (err) {
+				console.error("Error al cargar productos:", err);
+				setError(
+					"No se pudieron cargar los productos. Por favor intente nuevamente.",
+				);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchProducts();
 	}, [slug]);
 
-	const categoryTitle = useMemo(() => {
-		if (!slug) return "Categoría";
-		// simple: capitaliza o usa el título del primer producto
-		return products[0]?.categoryTitle ?? "Categoría";
-	}, [slug, products]);
+	const categoryTitle =
+		products[0]?.categoryTitle ??
+		(slug
+			? slug
+					.split("-")
+					.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+					.join(" ")
+			: "Categoría");
 
+	// Manejar estados de carga y error
+	if (loading) {
+		return (
+			<div className="bg-white pt-20">
+				<div className="container">
+					<div className="text-center py-16">
+						<p className="text-lg">Cargando productos...</p>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="bg-white pt-20">
+				<section className="mt-5 md:mt-15">
+					<div className="container">
+						<div className="mb-8">
+							<Link
+								to="/productos"
+								className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center"
+							>
+								<i className="las la-arrow-left mr-2"></i>
+								Volver a categorías
+							</Link>
+						</div>
+
+						<div className="text-center py-16">
+							<h3 className="text-xl font-bold mb-2">Error</h3>
+							<p className="text-gray-600 mb-6">{error}</p>
+							<Link
+								to="/productos"
+								className="inline-flex items-center px-6 py-3 bg-blue-primary text-white rounded-lg"
+							>
+								Volver a categorías
+							</Link>
+						</div>
+					</div>
+				</section>
+			</div>
+		);
+	}
 	return (
 		<div className="bg-white pt-20">
 			<section className="mt-5 md:mt-15">
