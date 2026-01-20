@@ -20,3 +20,27 @@ export async function listarMarcas(): Promise<Marca[]> {
 		TTL,
 	);
 }
+
+// Crear una nueva marca
+export async function crearMarca(marca: Omit<Marca, "id">): Promise<Marca> {
+	const api = await Api.getInstance();
+	const res = await api.post<Omit<Marca, "id">, Marca>(marca, {
+		url: `/api/marcas`
+	});
+	return res.data;
+}
+
+// Editar una marca
+export async function editarMarca(marca: Marca): Promise<Marca> {
+	const api = await Api.getInstance();
+	const res = await api.put<Marca, Marca>(marca, {
+		url: `/api/marcas/${marca.id}`
+	});
+	return res.data;
+}
+
+// Eliminar una marca
+export async function eliminarMarca(id: number): Promise<void> {
+	const api = await Api.getInstance();
+	await api.delete({ url: `/api/marcas/${id}` });
+}

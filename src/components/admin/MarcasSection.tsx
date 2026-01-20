@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { listarMarcas } from "@services/marca/Marca";
+import { crearMarca, editarMarca, listarMarcas } from "@services/marca/Marca";
 import Api from "@services/api";
 import AdminModal from "./AdminModal";
 import DeleteConfirmation from "./DeleteConfirmation";
@@ -62,31 +62,46 @@ export default function MarcasSection() {
 
   const handleSubmit = async () => {
     if (!formData.nombre.trim() || !formData.imagenUrl.trim()) {
-      setError("Todos los campos son obligatorios");
-      return;
-    }
+			setError("Todos los campos son obligatorios");
+			return;
+		}
 
-    setIsSubmitting(true);
-    try {
-      const api = await Api.getInstance();
-      if (editingId) {
-        // Actualizar
-        await api.put(formData, { url: `/api/marcas/${editingId}` });
-        setSuccess("Marca actualizada exitosamente");
-      } else {
-        // Crear
-        await api.post(formData, { url: "/api/marcas" });
-        setSuccess("Marca creada exitosamente");
-      }
-      await loadMarcas();
-      handleCloseModal();
-      setError(null);
-    } catch (err) {
-      setError("Error al guardar marca");
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
+		setIsSubmitting(true);
+		try {
+			if (editingId) {
+				const marcaActualizada = await editarMarca(formData);
+				console.log("Marca actualizada recibida:", marcaActualizada);
+
+				// Actualizar estado
+				setMarcas((prevMarcas) => {
+					const nuevasMarcas = prevMarcas.map((marca) =>
+						marca.id === marcaActualizada.id ? marcaActualizada : marca,
+					);
+					console.log("Nuevo estado de marcas:", nuevasMarcas);
+					return nuevasMarcas;
+				});
+
+				setSuccess("Marca actualizada exitosamente");
+			} else {
+				const nuevaMarca = await crearMarca(formData);
+				console.log("Nueva marca recibida:", nuevaMarca);
+
+				setMarcas((prevMarcas) => {
+					const nuevasMarcas = [...prevMarcas, nuevaMarca];
+					console.log("Nuevo estado de marcas:", nuevasMarcas);
+					return nuevasMarcas;
+				});
+
+				setSuccess("Marca creada exitosamente");
+			}
+			handleCloseModal();
+			setError(null);
+		} catch (err) {
+			setError("Error al guardar marca");
+			console.error(err);
+		} finally {
+			setIsSubmitting(false);
+		}
   };
 
   const handleDeleteClick = (marca: Marca) => {

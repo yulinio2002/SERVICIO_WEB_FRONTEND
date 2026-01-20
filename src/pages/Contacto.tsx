@@ -30,7 +30,10 @@ const Contacto = () => {
   return (
 		<div className="wrapper bg-white">
 			{/* Contact Form Section */}
-			<section className="bg-gradient-to-r from-orange-50 to-blue-50 p-6 rounded-lg pt-4 pb-12" id="form">
+			<section
+				className="bg-gradient-to-r from-orange-50 to-blue-50 p-6 rounded-lg pt-4 pb-12"
+				id="form"
+			>
 				<Container>
 					<div className="w-full rounded-2xl py-10 px-7 md:px-10 lg:py-28 lg:px-24">
 						<p className="subtitle text-center mb-4 2xl:mb-5 text-black">
@@ -44,8 +47,7 @@ const Contacto = () => {
 							contigo a la brevedad.
 						</p>
 
-						<form
-							onSubmit={handleSubmit}>
+						<form onSubmit={handleSubmit}>
 							<div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-y-6 gap-x-24">
 								<div>
 									<input
@@ -173,11 +175,12 @@ const Contacto = () => {
 					<iframe
 						loading="lazy"
 						className="w-full h-96 rounded-2xl"
-						src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.3959!2d-77.0099!3d-12.0464!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTLCsDAyJzQ3LjAiUyA3N8KwMDAnMzUuNiJX!5e0!3m2!1ses!2spe!4v1234567890"
+						src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3900.272821381431!2d-76.98593492512096!3d-12.161819988084055!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTLCsDA5JzQyLjYiUyA3NsKwNTknMDAuMSJX!5e0!3m2!1ses-419!2spe!4v1768932797230!5m2!1ses-419!2spe"
 						style={{ border: 0 }}
 						allowFullScreen
 						title="Ubicación de Oleohidraulics Services"
 					/>
+
 				</Container>
 			</section>
 		</div>

@@ -53,7 +53,7 @@ const ProductsDropdown: React.FC<ProductsDropdown> = ({ onClose }) => {
 						{/* Funcionalidad Column */}
 						<div className="col-span-6">
 							<Link
-								to="/funcionalidad"
+								to="/productos"
 								className="block font-bold border-b border-gray-primary mb-6 pb-6"
 								onClick={onClose}
 							>
@@ -63,7 +63,7 @@ const ProductsDropdown: React.FC<ProductsDropdown> = ({ onClose }) => {
 								{funcionalidades.map((item) => (
 									<Link
 										key={item}
-										to={`/funcionalidad/${item.toLowerCase().replace(/\s+/g, "-")}`}
+										to={`/productos/${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, "_")}`}
 										className="hover:font-bold"
 										onClick={onClose}
 									>
