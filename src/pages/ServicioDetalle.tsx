@@ -1,11 +1,11 @@
 // src/pages/ServicioDetalle.tsx
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import ServiceGallery from '@components/servicios/ServiceGallery';
-import QuoteForm from '@components/servicios/QuoteForm';
-import type { Service } from '@interfaces/servicio/Service.ts';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import ServiceGallery from "@components/servicios/ServiceGallery";
+import QuoteForm from "@components/servicios/QuoteForm";
+import type { Service } from "@interfaces/servicio/Service.ts";
 import QuoteButton from "@components/common/QuoteButton.tsx";
-import { obtenerServicio } from "@services/servicio/Servicio.ts";
+import { obtenerServicioPorSlug } from "@services/servicio/Servicio.ts";
 
 const ServicioDetalle: React.FC = () => {
 	const { slug } = useParams<{ slug: string }>();
@@ -23,48 +23,25 @@ const ServicioDetalle: React.FC = () => {
 	const fetchServiceData = async () => {
 		setLoading(true);
 		try {
-			// Aquí iría la llamada a tu API
-			const data = await obtenerServicio(1); // Reemplaza '1' con el ID real basado en el slug
+			if (!slug) {
+				throw new Error("Slug no proporcionado");
+			}
 
-			// Mock data
-			{/* const mockService: Service = {
-				id: 3,
-				title: 'Diseño y Consultoría',
-				slug: 'diseno-y-consultoria',
-				description: '¿Tu proyecto necesita hidráulica?',
-				content: `Contacta con nosotros, desde el primer paso te guiaremos desde la etapa conceptual o ingeniería básica y a través de todo el proceso de diseño. Nuestro Staff de profesionales lo guiaran hasta obtener la mejor solución a su necesidad.`,
-				features: [
-					'Cálculos: Potencia mecánica, fuerza, velocidad y exigencias (estáticas y dinámicas)',
-					'Selección del actuador',
-					'Cálculos de mecánica de fluidos',
-					'Cálculos de disipación de calor',
-					'Diagrama hidráulico y lista de materiales (BOM)',
-					'Dimensionamiento y selección de componentes',
-					'Isométrico de tuberías',
-					'CAD 3D',
-					'Documentación técnica',
-				],
-				images: ['/images/img1.jpg'],
-				galleryImages: [
-					{ id: 1, url: '/images/img1.jpg', alt: 'Proyecto 1' },
-					{ id: 2, url: '/images/img2.jpg', alt: 'Proyecto 2' },
-					{ id: 3, url: '/images/img3.jpg', alt: 'Proyecto 3' },
-				],
-			};
-			*/}
-
+			// Usar la nueva función que aprovecha la cache
+			const data = await obtenerServicioPorSlug(slug);
 			setService(data);
 		} catch (error) {
-			console.error('Error fetching service:', error);
+			console.error("Error fetching service:", error);
+			setService(null);
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	const scrollToForm = () => {
-		const formElement = document.getElementById('form');
+		const formElement = document.getElementById("form");
 		if (formElement) {
-			formElement.scrollIntoView({ behavior: 'smooth' });
+			formElement.scrollIntoView({ behavior: "smooth" });
 		}
 	};
 

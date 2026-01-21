@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import QuoteForm from "@components/servicios/QuoteForm";
 import type { ProductItem } from "@interfaces/product/ProductTypes";
@@ -51,10 +51,6 @@ const ProductoDetalle: React.FC = () => {
 		};
 	}, [slug]);
 
-	const bullets = useMemo(() => {
-		//  en backend ya viene como array
-		return product?.features?.length ? product.features : [];
-	}, [product]);
 
 	if (loading) {
 		return (

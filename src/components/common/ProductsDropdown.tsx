@@ -7,7 +7,7 @@ interface ProductsDropdown {
 }
 
 const ProductsDropdown: React.FC<ProductsDropdown> = ({ onClose }) => {
-	const funcionalidades = [
+	const categorias = [
 		"Abrazaderas",
 		"Accesorios Hidráulicos",
 		"Acumuladores Hidráulicos",
@@ -60,7 +60,7 @@ const ProductsDropdown: React.FC<ProductsDropdown> = ({ onClose }) => {
 								PRODUCTOS
 							</Link>
 							<div className="grid grid-cols-2 gap-3 text-sm xl:text-base">
-								{funcionalidades.map((item) => (
+								{categorias.map((item) => (
 									<Link
 										key={item}
 										to={`/productos/${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, "_")}`}

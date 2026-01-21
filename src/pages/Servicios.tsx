@@ -23,35 +23,6 @@ const Servicios: React.FC = () => {
 		};
 	}, []);
 
-	{/* Mock data
-	const services: ServiceSummary[] = [
-		{
-			id: 1,
-			title: "Fabricación de Sistemas",
-			slug: "fabricacion-de-sistemas",
-			image: "/images/img1.jpg",
-		},
-		{
-			id: 2,
-			title: "Control y Automatización",
-			slug: "control-y-automatizacion",
-			image: "/images/img2.jpg",
-		},
-		{
-			id: 3,
-			title: "Fabricación de Piezas a Medida",
-			slug: "fabricacion-de-piezas-a-medida",
-			image: "/images/img3.jpg",
-		},
-		{
-			id: 4,
-			title: "Suministro e Instalación de Tuberías",
-			slug: "suministro-e-instalacion-de-tuberias",
-			image: "/images/img1.jpg",
-		},
-	];
-	*/	}
-
 	return (
 		<div className="bg-white">
 			{/* Hero */}

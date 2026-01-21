@@ -12,14 +12,14 @@ import type { Empresa } from "../interfaces/empresa/Empresa"; // Ajusta la ruta 
 import "../styles/Nosotros.css";
 
 const values = [
-  { label: "Responsabilidad", icon: "./Nosotros - Oleohidraulics Services S.A.C._files/541d006ae1849-4995.svg" },
-  { label: "Compromiso", icon: "/icons/compromiso.svg" },
-  { label: "Honestidad", icon: "/icons/honestidad.svg" },
-  { label: "Integridad", icon: "/icons/integridad.svg" },
-  { label: "Confianza", icon: "/icons/confianza.svg" },
-  { label: "Trabajo en equipo", icon: "/icons/trabajo-equipo.svg" },
-  { label: "Perseverancia", icon: "/icons/perseverancia.svg" },
-  { label: "Dedicación", icon: "/icons/dedicacion.svg" },
+  { label: "Responsabilidad", icon: "/home/responsabilidad.svg" },
+  { label: "Compromiso", icon: "/home/compromiso.svg" },
+  { label: "Honestidad", icon: "/home/honestidad.svg" },
+  { label: "Integridad", icon: "/home/integridad.svg" },
+  { label: "Confianza", icon: "/home/confianza.svg" },
+  { label: "Trabajo en equipo", icon: "/home/teamwork.svg" },
+  { label: "Perseverancia", icon : "/home/perseverancia.svg" },
+  { label: "Dedicación", icon: "/home/dedicacion.svg" },
 ];
 
 const Nosotros = () => {

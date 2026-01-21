@@ -91,3 +91,22 @@ export async function getTop5Servicios(): Promise<ServiceSummary[]> {
 		TTL_5_MIN,
 	);
 }
+
+export async function obtenerServicioPorSlug(slug: string): Promise<Service> {
+	return cacheGetOrSet(
+		`servicios:slug:${slug}`,
+		async () => {
+			// Obtener la lista de servicios (ya está cacheada)
+			const servicios = await listarServicios();
+			// Buscar el servicio por slug en la lista cacheada
+			const servicioResumen = servicios.find((s) => s.slug === slug);
+
+			if (!servicioResumen) {
+				throw new Error(`Servicio con slug "${slug}" no encontrado`);
+			}
+			// Obtener el detalle usando el ID encontrado
+			return await obtenerServicio(servicioResumen.id);
+		},
+		TTL_5_MIN,
+	);
+}

@@ -7,6 +7,8 @@ import ServiciosSection from "@components/admin/ServiciosSection";
 import ProductosSection from "@components/admin/ProductosSection";
 import ProyectosSection from "@components/admin/ProyectosSection";
 import EmpresasSection from "@components/admin/EmpresasSection";
+import UsersSection from "@components/admin/UsersSection.tsx";
+
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("marcas");
@@ -51,6 +53,7 @@ export default function Admin() {
         {activeTab === "productos" && <ProductosSection />}
         {activeTab === "proyectos" && <ProyectosSection />}
         {activeTab === "empresas" && <EmpresasSection />}
+				{activeTab === "usuarios" && <UsersSection/>}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ export default function AdminNav({ activeTab, onTabChange }: AdminNavProps) {
     { id: "servicios", label: "Servicios" },
     { id: "productos", label: "Productos" },
     { id: "proyectos", label: "Proyectos" },
+		{ id: "usuarios", label: "Usuarios" },
   ];
 
   return (
