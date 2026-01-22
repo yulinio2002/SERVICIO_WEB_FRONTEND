@@ -7,7 +7,7 @@ export type Marca = {
 	imagenUrl: string;
 };
 
-const TTL = 5 * 60 * 1000;
+const TTL = 1 * 60 * 1000;
 
 export async function listarMarcas(): Promise<Marca[]> {
 	return cacheGetOrSet(
