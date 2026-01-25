@@ -3,6 +3,11 @@ import Api from "@services/api";
 import AdminModal from "./AdminModal";
 import DeleteConfirmation from "./DeleteConfirmation";
 import Alert from "./Alert";
+import {
+	agregarProductoDestacado,
+	eliminarProductoDestacado,
+	listarProductosDestacados,
+} from "@services/producto/Producto.ts";
 
 interface Producto {
 	id: number;
@@ -17,7 +22,10 @@ interface Producto {
 
 export default function ProductosSection() {
 	const [productos, setProductos] = useState<Producto[]>([]);
+	const [productosDestacados, setProductosDestacados] = useState<number[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [loadingDestacados, setLoadingDestacados] = useState(true);
+	const [isSubmittingDestacado, setIsSubmittingDestacado] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 	const [editingId, setEditingId] = useState<number | null>(null);
@@ -55,6 +63,7 @@ export default function ProductosSection() {
 
 	useEffect(() => {
 		loadProductos();
+		loadProductosDestacados();
 	}, []);
 
 	const loadProductos = async () => {
@@ -71,6 +80,48 @@ export default function ProductosSection() {
 			console.error(err);
 		} finally {
 			setLoading(false);
+		}
+	};
+
+	const loadProductosDestacados = async () => {
+		try {
+			setLoadingDestacados(true);
+			const destacados = await listarProductosDestacados();
+			const ids = destacados.map((producto) => producto.id);
+			setProductosDestacados(ids);
+		} catch (err) {
+			console.error("Error al cargar productos destacados:", err);
+			setProductosDestacados([]);
+		} finally {
+			setLoadingDestacados(false);
+		}
+	};
+
+	const toggleDestacado = async (productoId: number) => {
+		try {
+			setIsSubmittingDestacado(true);
+
+			if (productosDestacados.includes(productoId)) {
+				// Eliminar de destacados
+				const success = await eliminarProductoDestacado(productoId);
+				if (success) {
+					setProductosDestacados((prev) =>
+						prev.filter((id) => id !== productoId),
+					);
+					setSuccess("Producto eliminado de destacados");
+				}
+			} else {
+				// Agregar a destacados
+				const success = await agregarProductoDestacado(productoId);
+				if (success) {
+					setProductosDestacados((prev) => [...prev, productoId]);
+					setSuccess("Producto agregado a destacados");
+				}
+			}
+		} catch (err: any) {
+			setError(err.message || "Error al modificar producto destacado");
+		} finally {
+			setIsSubmittingDestacado(false);
 		}
 	};
 
@@ -238,11 +289,7 @@ export default function ProductosSection() {
 	return (
 		<div>
 			{error && (
-				<Alert
-					type="error"
-					message={error}
-					onClose={() => setError(null)}
-				/>
+				<Alert type="error" message={error} onClose={() => setError(null)} />
 			)}
 			{success && (
 				<Alert
@@ -254,53 +301,85 @@ export default function ProductosSection() {
 
 			<div className="flex justify-between items-center mb-6">
 				<h2 className="text-2xl font-bold">Productos</h2>
-				<button
-					onClick={() => handleOpenModal()}
-					className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-				>
-					+ Nuevo Producto
-				</button>
+				<div className="flex gap-2">
+					<button
+						onClick={() => handleOpenModal()}
+						className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+					>
+						+ Nuevo Producto
+					</button>
+				</div>
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-				{productos.map((producto) => (
-					<div
-						key={producto.id}
-						className="bg-white border border-gray-200 rounded-lg shadow p-4 hover:shadow-lg transition-shadow"
-					>
-						{producto.img_url && (
-							<img
-								src={producto.img_url}
-								alt={producto.nombre}
-								className="w-full h-32 object-cover rounded mb-3"
-							/>
-						)}
-						<h3 className="font-bold text-lg mb-1">{producto.nombre}</h3>
-						<p className="text-sm text-gray-600 mb-1">
-							<strong>Marca:</strong> {producto.marca}
-						</p>
-						<p className="text-sm text-gray-600 mb-2">
-							<strong>Categorías:</strong> {producto.categorias?.join(", ") || "Sin categorías"}
-						</p>
-						<p className="text-xs text-gray-500 mb-3 line-clamp-2">
-							{producto.descripcion}
-						</p>
-						<div className="flex gap-2">
+				{productos.map((producto) => {
+					const isDestacado = productosDestacados.includes(producto.id);
+
+					return (
+						<div
+							key={producto.id}
+							className="bg-white border border-gray-200 rounded-lg shadow p-4 hover:shadow-lg transition-shadow relative"
+						>
+							{/* Estrella para destacar */}
 							<button
-								onClick={() => handleOpenModal(producto)}
-								className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-3 rounded text-sm"
+								onClick={() => toggleDestacado(producto.id)}
+								disabled={isSubmittingDestacado}
+								className={`absolute top-3 right-3 z-10 p-2 rounded-full ${
+									isDestacado
+										? "bg-yellow-100 text-yellow-500 hover:bg-yellow-200"
+										: "bg-gray-100 text-gray-400 hover:bg-gray-200"
+								} transition-colors`}
+								title={
+									isDestacado ? "Quitar de destacados" : "Agregar a destacados"
+								}
 							>
-								Editar
+								<i
+									className={`las la-star text-xl ${isDestacado ? "text-yellow-500" : "text-gray-400"}`}
+								></i>
 							</button>
-							<button
-								onClick={() => handleDeleteClick(producto)}
-								className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded text-sm"
-							>
-								Eliminar
-							</button>
+
+							{/* Badge destacado */}
+							{isDestacado && (
+								<span className="absolute top-3 left-3 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded">
+									DESTACADO
+								</span>
+							)}
+
+							{producto.img_url && (
+								<img
+									src={producto.img_url}
+									alt={producto.nombre}
+									className="w-full h-32 object-cover rounded mb-3"
+								/>
+							)}
+							<h3 className="font-bold text-lg mb-1">{producto.nombre}</h3>
+							<p className="text-sm text-gray-600 mb-1">
+								<strong>Marca:</strong> {producto.marca}
+							</p>
+							<p className="text-sm text-gray-600 mb-2">
+								<strong>Categorías:</strong>{" "}
+								{producto.categorias?.join(", ") || "Sin categorías"}
+							</p>
+							<p className="text-xs text-gray-500 mb-3 line-clamp-2">
+								{producto.descripcion}
+							</p>
+							<div className="flex gap-2">
+								<button
+									onClick={() => handleOpenModal(producto)}
+									className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-3 rounded text-sm"
+								>
+									Editar
+								</button>
+								<button
+									onClick={() => handleDeleteClick(producto)}
+									className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded text-sm"
+								>
+									Eliminar
+								</button>
+							</div>
 						</div>
-					</div>
-				))}
+					);
+				})}
 			</div>
 
 			<AdminModal

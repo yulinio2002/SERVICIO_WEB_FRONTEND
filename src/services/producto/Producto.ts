@@ -1,5 +1,5 @@
 import Api from "@services/api";
-import { cacheGetOrSet } from "@services/cache";
+import { cacheDel, cacheGetOrSet } from "@services/cache";
 import type { ProductItem } from "@interfaces/product/ProductTypes";
 import { mapProductosBackendToProductItems } from "@interfaces/product/Mapper";
 
@@ -47,4 +47,109 @@ export async function listarProductosPorMarca(
 		},
 		TTL,
 	);
+}
+
+export async function listarProductosDestacados(): Promise<ProductItem[]> {
+	return cacheGetOrSet(
+		"productos:destacados",
+		async () => {
+			try {
+				const api = await Api.getInstance();
+				const res = await api.get<null, unknown[]>({
+					url: `/api/productosDestacados`,
+				});
+				return mapProductosBackendToProductItems(res.data);
+			} catch (error) {
+				console.error('Error obteniendo productos destacados:', error);
+				return [];
+			}
+		},
+		TTL,
+	);
+}
+
+export async function agregarProductoDestacado(idProducto: number): Promise<boolean> {
+	try {
+		const api = await Api.getInstance();
+
+		// Tu endpoint POST espera solo el ID (Long) en el body
+		const response = await api.post<number, boolean>(
+			idProducto,{url: `/api/productosDestacados`,});
+
+		cacheDel('productos:destacados');
+
+		return response.data;
+	} catch (error: any) {
+		console.error('Error agregando producto a destacados:', error);
+
+		// Manejo específico basado en los códigos HTTP de tu backend
+		if (error.response) {
+			switch (error.response.status) {
+				case 404:
+					console.error('Producto no encontrado');
+					throw new Error('Producto no encontrado');
+				case 409:
+					console.error('El producto ya está en destacados');
+					throw new Error('El producto ya está en destacados');
+				default:
+					console.error('Error del servidor:', error.response.status);
+					throw new Error('Error del servidor');
+			}
+		}
+
+		throw new Error('Error de conexión');
+	}
+}
+
+export async function eliminarProductoDestacado(idProducto: number): Promise<boolean> {
+	try {
+		const api = await Api.getInstance();
+
+		// Tu endpoint DELETE usa path variable
+		const response = await api.delete<boolean>({
+			url: `/api/productosDestacados/${idProducto}`
+		});
+
+		// Invalida la caché
+		cacheDel('productos:destacados');
+
+		// Tu backend devuelve Boolean directamente
+		return response.data;
+	} catch (error: any) {
+		console.error('Error eliminando producto de destacados:', error);
+
+		if (error.response?.status === 404) {
+			console.error('Producto destacado no encontrado');
+			throw new Error('Producto destacado no encontrado');
+		}
+
+		throw new Error('Error eliminando producto');
+	}
+}
+
+export async function estaProductoDestacado(idProducto: number): Promise<boolean> {
+	try {
+		const destacados = await listarProductosDestacados();
+
+		return destacados.some(producto => producto.id === idProducto);
+
+	} catch (error) {
+		console.error('Error verificando producto destacado:', error);
+		return false;
+	}
+}
+
+export async function toggleProductoDestacado(idProducto: number): Promise<boolean> {
+	try {
+		const yaDestacado = await estaProductoDestacado(idProducto);
+
+		if (yaDestacado) {
+			return await eliminarProductoDestacado(idProducto);
+		} else {
+			return await agregarProductoDestacado(idProducto);
+		}
+	} catch (error) {
+		console.error('Error alternando producto destacado:', error);
+		throw error;
+	}
 }

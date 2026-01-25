@@ -5,13 +5,14 @@ interface AdminNavProps {
 
 export default function AdminNav({ activeTab, onTabChange }: AdminNavProps) {
   const tabs = [
-    { id: "empresas", label: "Empresas" },
-    { id: "marcas", label: "Marcas" },
-    { id: "servicios", label: "Servicios" },
-    { id: "productos", label: "Productos" },
-    { id: "proyectos", label: "Proyectos" },
+		{ id: "empresas", label: "Empresas" },
+		{ id: "marcas", label: "Marcas" },
+		{ id: "servicios", label: "Servicios" },
+		{ id: "productos", label: "Productos" },
+		{ id: "destacados", label: "Destacados" },
+		{ id: "proyectos", label: "Proyectos" },
 		{ id: "usuarios", label: "Usuarios" },
-  ];
+	];
 
   return (
     <div className="bg-white shadow">
