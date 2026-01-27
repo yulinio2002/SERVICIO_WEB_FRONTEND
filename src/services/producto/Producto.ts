@@ -5,6 +5,29 @@ import { mapProductosBackendToProductItems } from "@interfaces/product/Mapper";
 
 const TTL = 1 * 60 * 1000;
 
+export type ProductoResponseDto = {
+	id: number;
+	nombre: string;
+	img_url: string;
+	descripcion: string;
+	content: string;
+	marca: string;
+	categorias: string[];
+	features: string[];
+};
+
+export type ProductoMultipartArgs = {
+	file: File;
+	nombre: string;
+	marca: string;
+	descripcion: string;
+	content: string;
+	/** Texto tal como lo espera el backend (p.ej. "A;B"). */
+	features?: string;
+	/** Lista de enums Categorias tal como los espera el backend (p.ej. "Bombas_Hidraulicas"). */
+	categorias: string[];
+};
+
 export async function listarProductos(): Promise<ProductItem[]> {
 	return cacheGetOrSet(
 		"productos:list",
@@ -152,4 +175,64 @@ export async function toggleProductoDestacado(idProducto: number): Promise<boole
 		console.error('Error alternando producto destacado:', error);
 		throw error;
 	}
+}
+
+export async function crearProducto(
+	args: ProductoMultipartArgs,
+): Promise<ProductoResponseDto> {
+	const api = await Api.getInstance();
+	const fd = new FormData();
+
+	fd.append("file", args.file);
+	fd.append("nombre", args.nombre);
+	fd.append("marca", args.marca);
+	fd.append("descripcion", args.descripcion);
+	fd.append("content", args.content);
+	if (args.features !== undefined) {
+		fd.append("features", args.features);
+	}
+	args.categorias.forEach((c) => fd.append("categorias", c));
+
+	const res = await api.post<FormData, ProductoResponseDto>(fd, {
+		url: "/api/productos",
+	});
+
+	cacheDel("productos:list");
+	cacheDel("productos:destacados");
+	return res.data;
+}
+
+export async function actualizarProducto(
+	id: number,
+	args: ProductoMultipartArgs,
+): Promise<ProductoResponseDto> {
+	const api = await Api.getInstance();
+	const fd = new FormData();
+
+	fd.append("file", args.file);
+	fd.append("nombre", args.nombre);
+	fd.append("marca", args.marca);
+	fd.append("descripcion", args.descripcion);
+	fd.append("content", args.content);
+	if (args.features !== undefined) {
+		fd.append("features", args.features);
+	}
+	args.categorias.forEach((c) => fd.append("categorias", c));
+
+	const res = await api.put<FormData, ProductoResponseDto>(fd, {
+		url: `/api/productos/${id}`,
+	});
+
+	cacheDel("productos:list");
+	cacheDel("productos:destacados");
+	cacheDel(`productos:${id}`);
+	return res.data;
+}
+
+export async function eliminarProducto(id: number): Promise<void> {
+	const api = await Api.getInstance();
+	await api.delete<void>({ url: `/api/productos/${id}` });
+	cacheDel("productos:list");
+	cacheDel("productos:destacados");
+	cacheDel(`productos:${id}`);
 }

@@ -4,7 +4,9 @@ import AdminModal from "./AdminModal";
 import DeleteConfirmation from "./DeleteConfirmation";
 import Alert from "./Alert";
 import {
+	actualizarProducto,
 	agregarProductoDestacado,
+	crearProducto,
 	eliminarProductoDestacado,
 	listarProductosDestacados,
 } from "@services/producto/Producto.ts";
@@ -24,7 +26,7 @@ export default function ProductosSection() {
 	const [productos, setProductos] = useState<Producto[]>([]);
 	const [productosDestacados, setProductosDestacados] = useState<number[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [loadingDestacados, setLoadingDestacados] = useState(true);
+	const [, setLoadingDestacados] = useState(true);
 	const [isSubmittingDestacado, setIsSubmittingDestacado] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -32,17 +34,19 @@ export default function ProductosSection() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [formData, setFormData] = useState({
 		nombre: "",
-		img_url: "",
+		img_url: "", // Mantenemos para mostrar imagen existente
 		descripcion: "",
 		content: "",
 		marca: "",
 		featuresText: "", // Para el textarea, luego se convierte a array
 		categorias: [] as string[],
 	});
+	const [selectedFile, setSelectedFile] = useState<File | null>(null); // Nuevo estado para el archivo
+	const [imagePreview, setImagePreview] = useState<string | null>(null); // Para previsualizar imagen
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [selectedProducto, setSelectedProducto] = useState<Producto | null>(
-		null
+		null,
 	);
 
 	// Categorías estáticas actualizadas
@@ -127,9 +131,7 @@ export default function ProductosSection() {
 
 	const handleOpenModal = (producto?: Producto) => {
 		if (producto) {
-			// Convertir array de features a texto (una por línea)
-			const featuresText = producto.features?.join('\n') || "";
-
+			const featuresText = producto.features?.join("\n") || "";
 			setFormData({
 				nombre: producto.nombre,
 				img_url: producto.img_url,
@@ -139,6 +141,7 @@ export default function ProductosSection() {
 				featuresText: featuresText,
 				categorias: producto.categorias || [],
 			});
+			setImagePreview(producto.img_url); // Mostrar imagen existente
 			setEditingId(producto.id);
 		} else {
 			setFormData({
@@ -150,6 +153,8 @@ export default function ProductosSection() {
 				featuresText: "",
 				categorias: [],
 			});
+			setImagePreview(null);
+			setSelectedFile(null);
 			setEditingId(null);
 		}
 		setIsModalOpen(true);
@@ -166,6 +171,40 @@ export default function ProductosSection() {
 			featuresText: "",
 			categorias: [],
 		});
+		setImagePreview(null);
+		setSelectedFile(null);
+	};
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			// Validar tipo de archivo
+			if (!file.type.startsWith("image/")) {
+				setError(
+					"Por favor, selecciona un archivo de imagen válido (JPG, PNG, etc.)",
+				);
+				return;
+			}
+
+			// Validar tamaño (ej: 5MB máximo)
+			if (file.size > 5 * 1024 * 1024) {
+				setError("La imagen es demasiado grande. Máximo 5MB.");
+				return;
+			}
+
+			setSelectedFile(file);
+
+			// Crear preview
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setImagePreview(reader.result as string);
+			};
+			reader.readAsDataURL(file);
+
+			// Limpiar URL de imagen si había una
+			setFormData((prev) => ({ ...prev, img_url: "" }));
+			setError(null);
+		}
 	};
 
 	const toggleCategoria = (categoria: string) => {
@@ -178,13 +217,9 @@ export default function ProductosSection() {
 	};
 
 	const handleSubmit = async () => {
-		// Validaciones
+		// Validaciones de campos de texto
 		if (!formData.nombre.trim()) {
 			setError("El nombre es obligatorio");
-			return;
-		}
-		if (!formData.img_url.trim()) {
-			setError("La URL de imagen es obligatoria");
 			return;
 		}
 		if (!formData.descripcion.trim()) {
@@ -204,37 +239,88 @@ export default function ProductosSection() {
 			return;
 		}
 
+		// Validación de imagen
+		if (!selectedFile && !editingId) {
+			setError("Debe seleccionar una imagen para el producto");
+			return;
+		}
+
+		// Para edición: si no hay nueva imagen pero hay preview (imagen existente)
+		// necesitamos manejar esto según lo que soporte el backend
+		if (editingId && !selectedFile && !imagePreview) {
+			setError("El producto debe tener una imagen");
+			return;
+		}
+
 		setIsSubmitting(true);
 		try {
-			const api = await Api.getInstance();
+			// Preparar array de categorías formateadas
+			const categoriasFormatted = formData.categorias.map((cat) =>
+				cat
+					.normalize("NFD")
+					.replace(/[\u0300-\u036f]/g, "")
+					.trim()
+					.toUpperCase()
+					.replace(/\s+/g, "_"),
+			);
 
-			// Preparar datos según ProductoRequestDto
-			const requestData = {
-				nombre: formData.nombre,
-				img_url: formData.img_url,
-				descripcion: formData.descripcion,
-				content: formData.content,
-				marca: formData.marca,
-				categorias: formData.categorias.map((cat) =>
-					cat
-						.normalize("NFD")
-						.replace(/[\u0300-\u036f]/g, "") // quitar acentos
-						.trim()
-						.toUpperCase()
-						.replace(/\s+/g, "_"),
-				),
-				// Convertir texto de features a array para featuresList
-				featuresList: formData.featuresText
-					.split("\n")
-					.map((f) => f.trim())
-					.filter((f) => f.length > 0),
-			};
+			// Preparar features
+			const featuresText = formData.featuresText
+				.split("\n")
+				.map((f) => f.trim())
+				.filter((f) => f.length > 0)
+				.join(";");
 
 			if (editingId) {
-				await api.put(requestData, { url: `/api/productos/${editingId}` });
+				// Para edición
+				if (selectedFile) {
+					// Si se subió nueva imagen
+					const requestData = {
+						file: selectedFile,
+						nombre: formData.nombre,
+						marca: formData.marca,
+						descripcion: formData.descripcion,
+						content: formData.content,
+						features: featuresText,
+						categorias: categoriasFormatted,
+					};
+					await actualizarProducto(editingId, requestData);
+				} else {
+					// Si no hay nueva imagen, usar el endpoint JSON existente
+					const api = await Api.getInstance();
+					const requestData = {
+						nombre: formData.nombre,
+						img_url: imagePreview || "", // Mantener imagen existente
+						descripcion: formData.descripcion,
+						content: formData.content,
+						marca: formData.marca,
+						categorias: categoriasFormatted,
+						featuresList: formData.featuresText
+							.split("\n")
+							.map((f) => f.trim())
+							.filter((f) => f.length > 0),
+					};
+					await api.put(requestData, { url: `/api/productos/${editingId}` });
+				}
 				setSuccess("Producto actualizado exitosamente");
 			} else {
-				await api.post(requestData, { url: "/api/productos" });
+				// Para creación - siempre requiere archivo
+				if (!selectedFile) {
+					setError("Debe seleccionar una imagen para crear un producto");
+					return;
+				}
+
+				const requestData = {
+					file: selectedFile,
+					nombre: formData.nombre,
+					marca: formData.marca,
+					descripcion: formData.descripcion,
+					content: formData.content,
+					features: featuresText,
+					categorias: categoriasFormatted,
+				};
+
+				await crearProducto(requestData);
 				setSuccess("Producto creado exitosamente");
 			}
 
@@ -244,7 +330,6 @@ export default function ProductosSection() {
 		} catch (err: any) {
 			console.error("Error detallado:", err);
 
-			// Manejar errores específicos del backend
 			let errorMessage = "Error al guardar producto";
 			if (err.response?.data?.message) {
 				errorMessage = err.response.data.message;
@@ -320,7 +405,6 @@ export default function ProductosSection() {
 							key={producto.id}
 							className="bg-white border border-gray-200 rounded-lg shadow p-4 hover:shadow-lg transition-shadow relative"
 						>
-							{/* Estrella para destacar */}
 							<button
 								onClick={() => toggleDestacado(producto.id)}
 								disabled={isSubmittingDestacado}
@@ -338,7 +422,6 @@ export default function ProductosSection() {
 								></i>
 							</button>
 
-							{/* Badge destacado */}
 							{isDestacado && (
 								<span className="absolute top-3 left-3 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded">
 									DESTACADO
@@ -477,18 +560,38 @@ Característica 3"
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1">
-							URL de imagen *
+							Imagen del producto *
 						</label>
+
+						{/* Preview de imagen */}
+						{imagePreview && (
+							<div className="mb-3">
+								<img
+									src={imagePreview}
+									alt="Vista previa"
+									className="w-32 h-32 object-cover rounded-md border border-gray-300"
+								/>
+								<p className="text-xs text-gray-500 mt-1">
+									Vista previa de la imagen
+								</p>
+							</div>
+						)}
+
+						{/* Input para subir archivo */}
 						<input
-							type="url"
-							value={formData.img_url}
-							onChange={(e) =>
-								setFormData({ ...formData, img_url: e.target.value })
-							}
-							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-							placeholder="https://ejemplo.com/imagen.jpg"
-							required
+							type="file"
+							accept="image/*"
+							onChange={handleFileChange}
+							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
 						/>
+						<p className="text-xs text-gray-500 mt-1">
+							Formatos aceptados: JPG, PNG, GIF, WebP. Tamaño máximo: 5MB
+							{editingId && (
+								<span className="block mt-1">
+									Deja vacío para mantener la imagen actual
+								</span>
+							)}
+						</p>
 					</div>
 
 					<div>
