@@ -20,7 +20,7 @@ export interface ProductItem {
 	id: number;
 	slug: string;
 	title: string;
-	marca?: string;
+	marca: string;
 	description: string;
 	content: string;
 	features: string[];
@@ -30,7 +30,5 @@ export interface ProductItem {
 	};
 	categorySlug: string;
 	categoryTitle: string;
-	specifications?: {
-		[key: string]: string;
-	};
+	categories: string[];
 }

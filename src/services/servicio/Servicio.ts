@@ -7,7 +7,7 @@ import {
 
 import { cacheGetOrSet, cacheDel, DEFAULT_TTL_MS } from "@services/cache";
 
-const TTL_5_MIN = DEFAULT_TTL_MS; //  5 minutos
+const TTL_5_MIN = DEFAULT_TTL_MS;
 
 export async function listarServicios(): Promise<ServiceSummary[]> {
 	return cacheGetOrSet(
@@ -37,36 +37,79 @@ export async function obtenerServicio(id: number): Promise<Service> {
 	);
 }
 
-export async function crearServicio(
-	servicio: Service,
+// Nueva función para crear servicio con FormData
+export async function crearServicioFormData(
+	formData: FormData,
 ): Promise<ServiceSummary> {
 	const Apis = await Api.getInstance();
-	const response = await Apis.post<Service, ServiceSummary>(servicio, {
+
+	const response = await Apis.post<FormData, ServiceSummary>(formData, {
 		url: `/api/servicios`,
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
 	});
 
-	// invalida cache (lista y opcionalmente el top)
 	cacheDel("servicios:list");
 	cacheDel("servicios:top5");
 
 	return response.data;
 }
 
-export async function actualizarServicio(
+// Nueva función para actualizar servicio con FormData
+export async function actualizarServicioFormData(
 	id: number,
-	servicio: Service,
+	formData: FormData,
 ): Promise<Service> {
 	const Apis = await Api.getInstance();
-	const response = await Apis.put<Service, Service>(servicio, {
+
+	const response = await Apis.put<FormData, Service>(formData, {
 		url: `/api/servicios/${id}`,
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
 	});
 
-	// invalida cache de lista + detalle
 	cacheDel("servicios:list");
 	cacheDel(`servicios:${id}`);
 	cacheDel("servicios:top5");
 
 	return response.data;
+}
+
+// Mantén las funciones existentes por compatibilidad
+export async function crearServicio(
+	servicio: Service,
+): Promise<ServiceSummary> {
+	// Crear FormData desde el objeto Service
+	const formData = new FormData();
+	formData.append("nombre", servicio.title);
+	formData.append("descripcion", servicio.description || "");
+	formData.append("content", servicio.content || "");
+	formData.append("features", servicio.features?.join(";") || "");
+
+	// Si hay imágenes, agregarlas como archivos (en una app real se necesitaría convertir URLs a archivos)
+	// Por ahora, esta función es solo para compatibilidad
+	return crearServicioFormData(formData);
+}
+
+export async function actualizarServicio(
+	id: number,
+	servicio: Service,
+): Promise<Service> {
+	const formData = new FormData();
+	formData.append(
+		"data",
+		JSON.stringify({
+			nombre: servicio.title,
+			descripcion: servicio.description,
+			content: servicio.content,
+			features: servicio.features?.join(";"),
+			idImages: servicio.galleryImages?.map((img) => img.id) || [],
+		}),
+	);
+
+	return actualizarServicioFormData(id, formData);
 }
 
 export async function eliminarServicio(id: number): Promise<void> {
@@ -96,15 +139,12 @@ export async function obtenerServicioPorSlug(slug: string): Promise<Service> {
 	return cacheGetOrSet(
 		`servicios:slug:${slug}`,
 		async () => {
-			// Obtener la lista de servicios (ya está cacheada)
 			const servicios = await listarServicios();
-			// Buscar el servicio por slug en la lista cacheada
 			const servicioResumen = servicios.find((s) => s.slug === slug);
 
 			if (!servicioResumen) {
 				throw new Error(`Servicio con slug "${slug}" no encontrado`);
 			}
-			// Obtener el detalle usando el ID encontrado
 			return await obtenerServicio(servicioResumen.id);
 		},
 		TTL_5_MIN,

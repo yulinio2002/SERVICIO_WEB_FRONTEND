@@ -5,6 +5,36 @@ import { mapProductosBackendToProductItems } from "@interfaces/product/Mapper";
 
 const TTL = 1 * 60 * 1000;
 
+export async function crearProductoFormData(
+	formData: FormData,
+): Promise<ProductItem> {
+	const api = await Api.getInstance();
+	const response = await api.post<FormData, ProductItem>(formData, {
+		url: `/api/productos`,
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+	});
+	cacheDel("productos:list");
+	return response.data;
+}
+
+export async function actualizarProductoFormData(
+	id: number,
+	formData: FormData,
+): Promise<ProductItem> {
+	const api = await Api.getInstance();
+	const response = await api.put<FormData, ProductItem>(formData, {
+		url: `/api/productos/${id}`,
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+	});
+	cacheDel("productos:list");
+	cacheDel(`productos:${id}`);
+	return response.data;
+}
+
 export async function listarProductos(): Promise<ProductItem[]> {
 	return cacheGetOrSet(
 		"productos:list",

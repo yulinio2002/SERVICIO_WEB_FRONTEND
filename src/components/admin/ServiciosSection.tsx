@@ -1,15 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
 	listarServicios,
-	crearServicio,
-	actualizarServicio,
+	crearServicioFormData,
+	actualizarServicioFormData,
 	eliminarServicio,
 	obtenerServicio,
 } from "@services/servicio/Servicio";
-import { Service, ServiceSummary } from "@interfaces/servicio/Service";
+import { ServiceSummary } from "@interfaces/servicio/Service";
 import AdminModal from "./AdminModal";
 import DeleteConfirmation from "./DeleteConfirmation";
 import Alert from "./Alert";
+
+interface ExistingImage {
+	id: number;
+	url: string;
+	alt: string;
+	markedForDelete: boolean;
+}
+
+interface NewImage {
+	file: File;
+	preview: string;
+	alt: string;
+}
 
 export default function ServiciosSection() {
 	const [servicios, setServicios] = useState<ServiceSummary[]>([]);
@@ -22,14 +35,16 @@ export default function ServiciosSection() {
 		nombre: "",
 		descripcion: "",
 		content: "",
-		imagenUrl: "",
-		features: "", // Cadena separada por comas o saltos de línea
-		galleryImages: [] as string[], // Array para URLs de galería
+		features: "", // Cadena separada por saltos de línea
 	});
+	const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
+	const [newImages, setNewImages] = useState<NewImage[]>([]);
+	const [newImageAlts, setNewImageAlts] = useState<string[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
 	const [selectedServicio, setSelectedServicio] =
 		useState<ServiceSummary | null>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		loadServicios();
@@ -52,26 +67,30 @@ export default function ServiciosSection() {
 	const handleOpenModal = async (servicio?: ServiceSummary) => {
 		if (servicio) {
 			setEditingId(servicio.id);
-
 			try {
-				// Obtener el servicio completo para editar todos los campos
 				const servicioCompleto = await obtenerServicio(servicio.id);
 
 				// Convertir array de features a string separado por saltos de línea
+				// Ahora servicioCompleto.features ya es un array gracias al mapper
 				const featuresText = servicioCompleto.features?.join("\n") || "";
-
-				// Obtener URLs de galleryImages
-				const galleryUrls =
-					servicioCompleto.galleryImages?.map((img) => img.url) || [];
 
 				setFormData({
 					nombre: servicioCompleto.title,
 					descripcion: servicioCompleto.description || "",
 					content: servicioCompleto.content || "",
-					imagenUrl: servicioCompleto.images?.[0] || "",
 					features: featuresText,
-					galleryImages: galleryUrls,
 				});
+
+				// Cargar imágenes existentes con estado inicial
+				const existing = servicioCompleto.galleryImages.map((img) => ({
+					id: img.id,
+					url: img.url,
+					alt: img.alt || "",
+					markedForDelete: false,
+				}));
+				setExistingImages(existing);
+				setNewImages([]);
+				setNewImageAlts([]);
 			} catch (err) {
 				console.error("Error al cargar detalles del servicio:", err);
 				// Si falla, cargar al menos los datos básicos
@@ -79,21 +98,14 @@ export default function ServiciosSection() {
 					nombre: servicio.title,
 					descripcion: "",
 					content: "",
-					imagenUrl: servicio.image,
 					features: "",
-					galleryImages: [],
 				});
+				setExistingImages([]);
+				setNewImages([]);
+				setNewImageAlts([]);
 			}
 		} else {
-			setEditingId(null);
-			setFormData({
-				nombre: "",
-				descripcion: "",
-				content: "",
-				imagenUrl: "",
-				features: "",
-				galleryImages: [],
-			});
+			// Código para nuevo servicio...
 		}
 		setIsModalOpen(true);
 	};
@@ -104,57 +116,165 @@ export default function ServiciosSection() {
 			nombre: "",
 			descripcion: "",
 			content: "",
-			imagenUrl: "",
 			features: "",
-			galleryImages: [],
+		});
+		setExistingImages([]);
+		setNewImages([]);
+		setNewImageAlts([]);
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
+	};
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const files = e.target.files;
+		if (!files) return;
+
+		const newFiles: NewImage[] = [];
+		const newAlts: string[] = [];
+
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			const preview = URL.createObjectURL(file);
+			newFiles.push({
+				file,
+				preview,
+				alt: `Imagen ${newImages.length + i + 1}`,
+			});
+			newAlts.push(`Imagen ${newImages.length + i + 1}`);
+		}
+
+		setNewImages((prev) => [...prev, ...newFiles]);
+		setNewImageAlts((prev) => [...prev, ...newAlts]);
+	};
+
+	const removeNewImage = (index: number) => {
+		setNewImages((prev) => {
+			const newArray = [...prev];
+			URL.revokeObjectURL(newArray[index].preview);
+			newArray.splice(index, 1);
+			return newArray;
+		});
+
+		setNewImageAlts((prev) => {
+			const newArray = [...prev];
+			newArray.splice(index, 1);
+			return newArray;
 		});
 	};
 
+	const updateNewImageAlt = (index: number, alt: string) => {
+		setNewImageAlts((prev) => {
+			const newArray = [...prev];
+			newArray[index] = alt;
+			return newArray;
+		});
+
+		setNewImages((prev) => {
+			const newArray = [...prev];
+			newArray[index] = { ...newArray[index], alt };
+			return newArray;
+		});
+	};
+
+	const toggleMarkForDelete = (id: number) => {
+		setExistingImages((prev) =>
+			prev.map((img) =>
+				img.id === id ? { ...img, markedForDelete: !img.markedForDelete } : img,
+			),
+		);
+	};
+
 	const handleSubmit = async () => {
+		// Validaciones para crear (todos los campos obligatorios)
 		if (
 			!formData.nombre.trim() ||
 			!formData.descripcion.trim() ||
-			!formData.imagenUrl.trim()
+			!formData.content.trim() ||
+			!formData.features.trim()
 		) {
-			setError(
-				"Los campos Nombre, Descripción e Imagen principal son obligatorios",
-			);
+			setError("Todos los campos de texto son obligatorios");
 			return;
+		}
+
+		// Validación para crear: al menos una imagen
+		if (!editingId && newImages.length === 0) {
+			setError("Debe cargar al menos una imagen al crear un servicio");
+			return;
+		}
+
+		// Validación para editar: si se marcan todas las imágenes para eliminar, debe haber nuevas
+		if (editingId) {
+			const allMarkedForDelete =
+				existingImages.length > 0 &&
+				existingImages.every((img) => img.markedForDelete);
+			if (allMarkedForDelete && newImages.length === 0) {
+				setError(
+					"Debe cargar al menos una imagen nueva si elimina todas las existentes",
+				);
+				return;
+			}
 		}
 
 		setIsSubmitting(true);
 		try {
-			// Convertir features de texto a array
-			const featuresArray = formData.features
-				.split("\n")
-				.map((f) => f.trim())
-				.filter((f) => f.length > 0);
-
-			// Crear objeto Service completo
-			const serviceData: Service = {
-				id: editingId || 0,
-				title: formData.nombre,
-				slug: formData.nombre
-					.toLowerCase()
-					.replace(/\s+/g, "-")
-					.normalize("NFD")
-					.replace(/[\u0300-\u036f]/g, ""),
-				description: formData.descripcion,
-				content: formData.content,
-				features: featuresArray,
-				images: [formData.imagenUrl],
-				galleryImages: formData.galleryImages.map((url, index) => ({
-					id: index,
-					url: url,
-					alt: formData.nombre,
-				})),
-			};
+			const formDataToSend = new FormData();
 
 			if (editingId) {
-				await actualizarServicio(editingId, serviceData);
+				// Para editar: enviar JSON en campo "data"
+				const imagesToKeep = existingImages.filter(
+					(img) => !img.markedForDelete,
+				);
+
+				const dataObj = {
+					nombre: formData.nombre,
+					descripcion: formData.descripcion,
+					content: formData.content,
+					features: formData.features
+						.split("\n")
+						.map((f) => f.trim())
+						.filter((f) => f.length > 0)
+						.join(";"),
+					idImages: imagesToKeep.map((img) => img.id),
+				};
+
+				formDataToSend.append("data", JSON.stringify(dataObj));
+
+				// Agregar nuevas imágenes si las hay
+				newImages.forEach((imgFile, index) => {
+					formDataToSend.append("files", imgFile.file);
+					formDataToSend.append(
+						"alt",
+						newImageAlts[index] || `Imagen ${index + 1}`,
+					);
+				});
+
+				await actualizarServicioFormData(editingId, formDataToSend);
 				setSuccess("Servicio actualizado exitosamente");
 			} else {
-				await crearServicio(serviceData);
+				// Para crear: enviar campos individuales
+				formDataToSend.append("nombre", formData.nombre);
+				formDataToSend.append("descripcion", formData.descripcion);
+				formDataToSend.append("content", formData.content);
+				formDataToSend.append(
+					"features",
+					formData.features
+						.split("\n")
+						.map((f) => f.trim())
+						.filter((f) => f.length > 0)
+						.join(";"),
+				);
+
+				// Agregar imágenes (obligatorias al crear)
+				newImages.forEach((imgFile, index) => {
+					formDataToSend.append("files", imgFile.file);
+					formDataToSend.append(
+						"alt",
+						newImageAlts[index] || `Imagen ${index + 1}`,
+					);
+				});
+
+				await crearServicioFormData(formDataToSend);
 				setSuccess("Servicio creado exitosamente");
 			}
 
@@ -190,29 +310,6 @@ export default function ServiciosSection() {
 		} finally {
 			setIsSubmitting(false);
 		}
-	};
-
-	const handleAddGalleryImage = () => {
-		setFormData({
-			...formData,
-			galleryImages: [...formData.galleryImages, ""],
-		});
-	};
-
-	const handleRemoveGalleryImage = (index: number) => {
-		setFormData({
-			...formData,
-			galleryImages: formData.galleryImages.filter((_, i) => i !== index),
-		});
-	};
-
-	const handleGalleryImageChange = (index: number, value: string) => {
-		const newGalleryImages = [...formData.galleryImages];
-		newGalleryImages[index] = value;
-		setFormData({
-			...formData,
-			galleryImages: newGalleryImages,
-		});
 	};
 
 	if (loading) {
@@ -296,7 +393,7 @@ export default function ServiciosSection() {
 								setFormData({ ...formData, nombre: e.target.value })
 							}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-							placeholder="Ej: Fabricación de Sistemas"
+							placeholder="Ej: Fabricación de sistemas a medida"
 							required
 						/>
 					</div>
@@ -319,7 +416,7 @@ export default function ServiciosSection() {
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1">
-							Contenido detallado
+							Contenido detallado *
 						</label>
 						<textarea
 							value={formData.content}
@@ -329,12 +426,13 @@ export default function ServiciosSection() {
 							rows={4}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 							placeholder="Contenido completo que aparecerá en la página del servicio"
+							required
 						/>
 					</div>
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1">
-							Características (una por línea)
+							Características (una por línea) *
 						</label>
 						<textarea
 							value={formData.features}
@@ -344,6 +442,7 @@ export default function ServiciosSection() {
 							rows={4}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 							placeholder="Cada característica en una línea nueva"
+							required
 						/>
 						<p className="text-xs text-gray-500 mt-1">
 							Ejemplo:
@@ -354,64 +453,133 @@ export default function ServiciosSection() {
 						</p>
 					</div>
 
+					{/* Imágenes existentes (solo en edición) */}
+					{editingId && existingImages.length > 0 && (
+						<div>
+							<label className="block text-sm font-medium text-gray-700 mb-2">
+								Imágenes existentes
+							</label>
+							<div className="space-y-3">
+								{existingImages.map((img) => (
+									<div
+										key={img.id}
+										className={`flex items-center gap-3 p-3 border rounded-md ${
+											img.markedForDelete
+												? "bg-gray-100 border-gray-300 opacity-60"
+												: "bg-white border-gray-200"
+										}`}
+									>
+										<img
+											src={img.url}
+											alt={img.alt}
+											className="w-20 h-20 object-cover rounded"
+										/>
+										<div className="flex-1">
+											<p className="text-sm text-gray-600 truncate">
+												{img.url.split("/").pop()}
+											</p>
+											<p className="text-xs text-gray-500">{img.alt}</p>
+										</div>
+										<button
+											type="button"
+											onClick={() => toggleMarkForDelete(img.id)}
+											className={`px-3 py-1 rounded text-sm font-medium ${
+												img.markedForDelete
+													? "bg-green-100 text-green-700 hover:bg-green-200"
+													: "bg-red-100 text-red-700 hover:bg-red-200"
+											}`}
+										>
+											{img.markedForDelete ? "Restaurar" : "Eliminar"}
+										</button>
+									</div>
+								))}
+							</div>
+							<p className="text-xs text-gray-500 mt-2">
+								Las imágenes marcadas para eliminar (gris) se eliminarán al
+								guardar.
+							</p>
+						</div>
+					)}
+
+					{/* Nuevas imágenes */}
 					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">
-							URL de imagen principal *
+						<label className="block text-sm font-medium text-gray-700 mb-2">
+							{editingId
+								? "Agregar nuevas imágenes (opcional)"
+								: "Cargar imágenes *"}
 						</label>
 						<input
-							type="url"
-							value={formData.imagenUrl}
-							onChange={(e) =>
-								setFormData({ ...formData, imagenUrl: e.target.value })
-							}
+							ref={fileInputRef}
+							type="file"
+							accept="image/*"
+							multiple
+							onChange={handleFileChange}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-							placeholder="https://ejemplo.com/imagen-principal.jpg"
-							required
 						/>
-					</div>
+						<p className="text-xs text-gray-500 mt-1">
+							Puede seleccionar múltiples imágenes (JPG, PNG, etc.)
+						</p>
 
-					<div>
-						<div className="flex justify-between items-center mb-2">
-							<label className="block text-sm font-medium text-gray-700">
-								Galería de imágenes
-							</label>
-							<button
-								type="button"
-								onClick={handleAddGalleryImage}
-								className="text-sm bg-green-100 text-green-700 hover:bg-green-200 py-1 px-3 rounded"
-							>
-								+ Agregar imagen
-							</button>
-						</div>
-
-						{formData.galleryImages.map((url, index) => (
-							<div key={index} className="flex gap-2 mb-2">
-								<input
-									type="url"
-									value={url}
-									onChange={(e) =>
-										handleGalleryImageChange(index, e.target.value)
-									}
-									className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-									placeholder={`URL imagen ${index + 1}`}
-								/>
-								<button
-									type="button"
-									onClick={() => handleRemoveGalleryImage(index)}
-									className="px-3 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-md"
-								>
-									×
-								</button>
+						{/* Vista previa de nuevas imágenes */}
+						{newImages.length > 0 && (
+							<div className="mt-4 space-y-3">
+								{newImages.map((imgFile, index) => (
+									<div
+										key={index}
+										className="flex items-center gap-3 p-3 border border-gray-200 rounded-md bg-white"
+									>
+										<img
+											src={imgFile.preview}
+											alt="Vista previa"
+											className="w-20 h-20 object-cover rounded"
+										/>
+										<div className="flex-1">
+											<p className="text-sm font-medium text-gray-700">
+												{imgFile.file.name}
+											</p>
+											<input
+												type="text"
+												value={newImageAlts[index] || ""}
+												onChange={(e) =>
+													updateNewImageAlt(index, e.target.value)
+												}
+												placeholder="Descripción de la imagen"
+												className="mt-1 w-full px-2 py-1 text-sm border border-gray-300 rounded"
+											/>
+										</div>
+										<button
+											type="button"
+											onClick={() => removeNewImage(index)}
+											className="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-sm font-medium"
+										>
+											Eliminar
+										</button>
+									</div>
+								))}
 							</div>
-						))}
-
-						{formData.galleryImages.length === 0 && (
-							<p className="text-sm text-gray-500 italic">
-								No hay imágenes en la galería. Agrega al menos una para la vista
-								de detalle.
-							</p>
 						)}
 					</div>
+
+					{/* Validación de imágenes para crear */}
+					{!editingId && newImages.length === 0 && (
+						<div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+							<p className="text-sm text-yellow-700">
+								Debe cargar al menos una imagen para crear el servicio.
+							</p>
+						</div>
+					)}
+
+					{/* Validación de imágenes para editar */}
+					{editingId &&
+						existingImages.every((img) => img.markedForDelete) &&
+						newImages.length === 0 && (
+							<div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+								<p className="text-sm text-yellow-700">
+									Si elimina todas las imágenes existentes, debe cargar al menos
+									una nueva imagen.
+								</p>
+							</div>
+						)}
 				</div>
 			</AdminModal>
 

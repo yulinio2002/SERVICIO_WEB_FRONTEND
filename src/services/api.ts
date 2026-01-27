@@ -40,20 +40,24 @@ export default class Api {
     config: AxiosRequestConfig
   ) {
     const headers: RawAxiosRequestHeaders = {
-      "Content-Type": "application/json",
-      ...(config.headers || {}),
-    };
+			...(config.headers || {}),
+		};
 
-    // 🔐 SOLO agrega Authorization si existe token
+    // SOLO agrega Authorization si existe token
     if (this._authorization) {
       headers["Authorization"] = `Bearer ${this._authorization}`;
     }
 
-    const configOptions: AxiosRequestConfig = {
-      ...config,
-      baseURL: this._basePath,
-      headers,
-    };
+		const isFormData = config.data instanceof FormData;
+		if (!isFormData && !headers["Content-Type"]) {
+			headers["Content-Type"] = "application/json";
+		}
+
+		const configOptions: AxiosRequestConfig = {
+			...config,
+			baseURL: this._basePath,
+			headers,
+		};
 
     const path = this._basePath + (config.url ?? "");
 

@@ -15,12 +15,12 @@ const generarSlug = (nombre: string): string => {
 // Mapper principal
 export const mapearServicioABackendAFrontend = (servicioBackend: unknown): Service => {
 	const sb = servicioBackend as {
-		fotos?: { id?: number; imagenUrl: string }[];
+		fotos?: { id?: number; imagenUrl: string , alt: string}[];
 		imagenUrl?: string;
 		nombre: string;
 		descripcion: string;
 		content: string;
-		features: string[];
+		features: string;
 		id: number;
 	};
 
@@ -33,16 +33,19 @@ export const mapearServicioABackendAFrontend = (servicioBackend: unknown): Servi
 	const galleryImages = (sb.fotos || []).map((foto) => ({
 		id: foto?.id ?? 0,
 		url: foto.imagenUrl,
-		alt: sb.nombre,
+		alt: foto.alt,
 	}));
 
+	const featuresArray = sb.features
+		? sb.features.split(";").map((f) => f.trim())
+		: [];
 	return {
 		id: sb.id ?? 0,
 		title: sb.nombre,
 		slug: generarSlug(sb.nombre),
 		description: sb.descripcion,
 		content: sb.content ?? "",
-		features: sb.features ?? [],
+		features: featuresArray,
 		images,
 		galleryImages,
 	};

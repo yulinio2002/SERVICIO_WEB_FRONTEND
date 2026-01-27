@@ -103,12 +103,6 @@ export default function ProductosDestacadosSection() {
 					<p className="text-gray-600 mb-4">
 						Agrega productos destacados desde la sección de productos
 					</p>
-					<a
-						href="/admin?tab=productos"
-						className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
-					>
-						Ir a Productos
-					</a>
 				</div>
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

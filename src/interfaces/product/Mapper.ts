@@ -24,6 +24,7 @@ export function mapProductoBackendToProductItem(b: any): ProductItem {
 		},
 		categorySlug: slugify([...b.categorias][0]),
 		categoryTitle: [...b.categorias][0].replaceAll("_", " "),
+		categories: b.categorias,
 	};
 }
 
