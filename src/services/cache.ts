@@ -83,3 +83,9 @@ export async function cacheGetOrSet<T>(
 	cacheSet(key, fresh, ttlMs);
 	return fresh;
 }
+
+export function cacheInvalidate(key: string) {
+	try {
+		localStorage.removeItem(key);
+	} catch {}
+}
